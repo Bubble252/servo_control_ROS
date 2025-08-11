@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/setup.sh

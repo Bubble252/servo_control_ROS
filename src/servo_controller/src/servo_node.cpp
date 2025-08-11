@@ -73,14 +73,27 @@ int main(int argc, char** argv) {
         ros::spinOnce();
 
         // Send commands to all servos based on stored targets
-        for (auto& [id, servo] : servo_map) {
-            int target_enc = target_positions[id];
-            try {
-                servo->PID_setAngle_control(target_enc);
-            } catch (const std::exception& e) {
-                ROS_ERROR("Failed to send command to servo ID=%d: %s", id, e.what());
-            }
-        }
+for (auto& [id, servo] : servo_map) {
+    if (!servo) {
+        ROS_WARN("servo pointer for ID=%d is nullptr, skipping command", id);
+        continue;
+    }
+    auto it = target_positions.find(id);
+    if (it == target_positions.end()) {
+        ROS_WARN("No target position found for servo ID=%d, skipping command", id);
+        continue;
+    }
+    int target_enc = it->second;
+
+    try {
+        servo->PID_setAngle_control(target_enc);
+    } catch (const std::exception& e) {
+        ROS_ERROR("Exception when sending command to servo ID=%d: %s", id, e.what());
+    } catch (...) {
+        ROS_ERROR("Unknown exception when sending command to servo ID=%d", id);
+    }
+}
+
 
         // Publish feedback
         sensor_msgs::JointState fb_msg;
@@ -89,28 +102,39 @@ int main(int argc, char** argv) {
         fb_msg.position.resize(10);
         fb_msg.velocity.resize(10);
         fb_msg.effort.resize(10);
+        
 
-        for (int i = 0; i < 10; ++i) {
-            int servo_id = i + 1;
-            fb_msg.name[i] = "servo_" + std::to_string(servo_id);
+for (int i = 0; i < 10; ++i) {
+    int servo_id = i + 1;
+    fb_msg.name[i] = "servo_" + std::to_string(servo_id);
 
-            if (servo_map.find(servo_id) == servo_map.end()) {
-                fb_msg.position[i] = 0.0;
-                fb_msg.velocity[i] = 0.0;
-                fb_msg.effort[i] = 0.0;
-                ROS_WARN_THROTTLE(10, "Servo ID=%d not initialized, sending zero feedback", servo_id);
-                continue;
-            }
+    auto it = servo_map.find(servo_id);
+    if (it == servo_map.end() || !(it->second)) {
+        fb_msg.position[i] = 0.0;
+        fb_msg.velocity[i] = 0.0;
+        fb_msg.effort[i] = 0.0;
+        ROS_WARN_THROTTLE(10, "Servo ID=%d not initialized or null pointer, sending zero feedback", servo_id);
+        continue;
+    }
 
-            auto fb = servo_map[servo_id]->get_feedback(servo_id);
+    try {
+        auto fb = it->second->get_feedback(servo_id);
+        fb_msg.position[i] = enc2rad(fb.pos);
+        fb_msg.velocity[i] = enc2rad(fb.speed);
+        fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
+    } catch (const std::exception& e) {
+        ROS_ERROR("Exception when getting feedback from servo ID=%d: %s", servo_id, e.what());
+        fb_msg.position[i] = 0.0;
+        fb_msg.velocity[i] = 0.0;
+        fb_msg.effort[i] = 0.0;
+    } catch (...) {
+        ROS_ERROR("Unknown exception when getting feedback from servo ID=%d", servo_id);
+        fb_msg.position[i] = 0.0;
+        fb_msg.velocity[i] = 0.0;
+        fb_msg.effort[i] = 0.0;
+    }
+}
 
-            fb_msg.position[i] = enc2rad(fb.pos);
-            fb_msg.velocity[i] = enc2rad(fb.speed);
-            fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
-
-            ROS_DEBUG("Feedback: ID=%d pos=%.3f rad, speed=%.3f rad/s, effort=%.3f Nm",
-                      servo_id, fb_msg.position[i], fb_msg.velocity[i], fb_msg.effort[i]);
-        }
 
         fb_pub.publish(fb_msg);
 

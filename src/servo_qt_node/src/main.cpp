@@ -5,7 +5,8 @@
 int main(int argc, char** argv) {
     ros::init(argc, argv, "qt_servo_control_node");
     ros::NodeHandle nh;
-
+    // 强制软件渲染，一定要放在 QApplication 创建之前
+    //QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
     QApplication app(argc, argv);
 
     QtServoControl window(nh);
