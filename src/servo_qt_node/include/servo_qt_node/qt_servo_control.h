@@ -16,7 +16,7 @@
 struct FeedbackData {
     std::deque<double> pos;
     std::deque<double> speed;
-    std::deque<double> current;
+    std::deque<double> effort;
 };
 
 class QtServoControl : public QWidget
@@ -37,7 +37,7 @@ private:
 // 在 QtServoControl 类里 private 成员区添加：
 QtCharts::QChartView* chartView_pos_;
 QtCharts::QChartView* chartView_speed_;
-QtCharts::QChartView* chartView_current_;
+QtCharts::QChartView* chartView_effort_;
 
     void publishJointStateTargets();
     void feedbackCallback(const sensor_msgs::JointState::ConstPtr& msg);
@@ -55,15 +55,15 @@ QtCharts::QChartView* chartView_current_;
     QtCharts::QLineSeries* series_pos_2_;
     QtCharts::QLineSeries* series_speed_1_;
     QtCharts::QLineSeries* series_speed_2_;
-    QtCharts::QLineSeries* series_current_1_;
-    QtCharts::QLineSeries* series_current_2_;
+    QtCharts::QLineSeries* series_effort_1_;
+    QtCharts::QLineSeries* series_effort_2_;
 
     QtCharts::QValueAxis* axisX_pos_;
     QtCharts::QValueAxis* axisY_pos_;
     QtCharts::QValueAxis* axisX_speed_;
     QtCharts::QValueAxis* axisY_speed_;
-    QtCharts::QValueAxis* axisX_current_;
-    QtCharts::QValueAxis* axisY_current_;
+    QtCharts::QValueAxis* axisX_effort_;
+    QtCharts::QValueAxis* axisY_effort_;
 
     double target_angle_1_ = 0.0;
     double target_angle_2_ = 0.0;

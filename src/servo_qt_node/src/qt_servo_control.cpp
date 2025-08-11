@@ -22,11 +22,11 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
 
     slider1_ = new QSlider(Qt::Horizontal);
     slider1_->setRange(-314, 314);  // -π 到 π, *100缩放
-    slider1_->setValue(0);
+    slider1_->setValue(-268);
 
     slider2_ = new QSlider(Qt::Horizontal);
     slider2_->setRange(-314, 314);
-    slider2_->setValue(0);
+    slider2_->setValue(-16);
 
     connect(slider1_, &QSlider::valueChanged, this, &QtServoControl::onSlider1Changed);
     connect(slider2_, &QSlider::valueChanged, this, &QtServoControl::onSlider2Changed);
@@ -42,10 +42,10 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     series_speed_2_ = new QtCharts::QLineSeries();
     series_speed_2_->setName("ID2 Speed");
 
-    series_current_1_ = new QtCharts::QLineSeries();
-    series_current_1_->setName("ID1 Effort");
-    series_current_2_ = new QtCharts::QLineSeries();
-    series_current_2_->setName("ID2 Effort");
+    series_effort_1_ = new QtCharts::QLineSeries();
+    series_effort_1_->setName("ID1 Effort");
+    series_effort_2_ = new QtCharts::QLineSeries();
+    series_effort_2_->setName("ID2 Effort");
 
     // 位置图
     QtCharts::QChart* chart_pos = new QtCharts::QChart();
@@ -96,28 +96,28 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     chartView_speed_ = new QtCharts::QChartView(chart_speed);
 
     // 力矩图（effort）
-    QtCharts::QChart* chart_current = new QtCharts::QChart();
-    chart_current->addSeries(series_current_1_);
-    chart_current->addSeries(series_current_2_);
+    QtCharts::QChart* chart_effort = new QtCharts::QChart();
+    chart_effort->addSeries(series_effort_1_);
+    chart_effort->addSeries(series_effort_2_);
 
-    axisX_current_ = new QtCharts::QValueAxis();
-    axisX_current_->setRange(0, maxDataCount);
-    axisX_current_->setLabelFormat("%d");
-    axisX_current_->setTitleText("Sample");
+    axisX_effort_ = new QtCharts::QValueAxis();
+    axisX_effort_->setRange(0, maxDataCount);
+    axisX_effort_->setLabelFormat("%d");
+    axisX_effort_->setTitleText("Sample");
 
-    axisY_current_ = new QtCharts::QValueAxis();
-    axisY_current_->setRange(0, 15);
-    axisY_current_->setTitleText("Effort (Nm)");
+    axisY_effort_ = new QtCharts::QValueAxis();
+    axisY_effort_->setRange(0, 15);
+    axisY_effort_->setTitleText("Effort (Nm)");
 
-    chart_current->addAxis(axisX_current_, Qt::AlignBottom);
-    chart_current->addAxis(axisY_current_, Qt::AlignLeft);
-    series_current_1_->attachAxis(axisX_current_);
-    series_current_1_->attachAxis(axisY_current_);
-    series_current_2_->attachAxis(axisX_current_);
-    series_current_2_->attachAxis(axisY_current_);
-    chart_current->setTitle("Effort");
+    chart_effort->addAxis(axisX_effort_, Qt::AlignBottom);
+    chart_effort->addAxis(axisY_effort_, Qt::AlignLeft);
+    series_effort_1_->attachAxis(axisX_effort_);
+    series_effort_1_->attachAxis(axisY_effort_);
+    series_effort_2_->attachAxis(axisX_effort_);
+    series_effort_2_->attachAxis(axisY_effort_);
+    chart_effort->setTitle("Effort");
 
-    chartView_current_ = new QtCharts::QChartView(chart_current);
+    chartView_effort_ = new QtCharts::QChartView(chart_effort);
 
     // 主布局
     QVBoxLayout* mainLayout = new QVBoxLayout;
@@ -127,7 +127,7 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     mainLayout->addWidget(slider2_);
     mainLayout->addWidget(chartView_pos_);
     mainLayout->addWidget(chartView_speed_);
-    mainLayout->addWidget(chartView_current_);
+    mainLayout->addWidget(chartView_effort_);
 
     setLayout(mainLayout);
 
@@ -188,13 +188,13 @@ void QtServoControl::feedbackCallback(const sensor_msgs::JointState::ConstPtr& m
         if (data.pos.size() >= maxDataCount) {
             data.pos.pop_front();
             data.speed.pop_front();
-            data.current.pop_front();
+            data.effort.pop_front();
         }
 
         if (i < msg->position.size() && i < msg->velocity.size() && i < msg->effort.size()) {
             data.pos.push_back(msg->position[i]);
             data.speed.push_back(msg->velocity[i]);
-            data.current.push_back(msg->effort[i]);
+            data.effort.push_back(msg->effort[i]);
         }
     }
 }
@@ -204,8 +204,8 @@ void QtServoControl::updateCharts() {
     series_pos_2_->clear();
     series_speed_1_->clear();
     series_speed_2_->clear();
-    series_current_1_->clear();
-    series_current_2_->clear();
+    series_effort_1_->clear();
+    series_effort_2_->clear();
 
     auto addPoints = [](QtCharts::QLineSeries* series, const std::deque<double>& data) {
         for (size_t i = 0; i < data.size(); ++i) {
@@ -216,12 +216,12 @@ void QtServoControl::updateCharts() {
     if (feedbackData_.count(1)) {
         addPoints(series_pos_1_, feedbackData_[1].pos);
         addPoints(series_speed_1_, feedbackData_[1].speed);
-        addPoints(series_current_1_, feedbackData_[1].current);
+        addPoints(series_effort_1_, feedbackData_[1].effort);
     }
     if (feedbackData_.count(2)) {
         addPoints(series_pos_2_, feedbackData_[2].pos);
         addPoints(series_speed_2_, feedbackData_[2].speed);
-        addPoints(series_current_2_, feedbackData_[2].current);
+        addPoints(series_effort_2_, feedbackData_[2].effort);
     }
 }
 

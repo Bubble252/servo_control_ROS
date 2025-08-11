@@ -758,18 +758,6 @@ vector
 time.h
 -
 
-/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/qt_servo_control_node_autogen/KB7GKGVG4R/moc_qt_servo_control.cpp
-include/servo_qt_node/qt_servo_control.h
-/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/qt_servo_control_node_autogen/KB7GKGVG4R/include/servo_qt_node/qt_servo_control.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/qt_servo_control_node_autogen/mocs_compilation.cpp
-KB7GKGVG4R/moc_qt_servo_control.cpp
-/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/qt_servo_control_node_autogen/KB7GKGVG4R/moc_qt_servo_control.cpp
-
 /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
 QWidget
 -
@@ -793,14 +781,6 @@ QLabel
 -
 QSlider
 -
-
-/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/main.cpp
-QApplication
--
-ros/ros.h
--
-servo_qt_node/qt_servo_control.h
-/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/servo_qt_node/qt_servo_control.h
 
 /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/qt_servo_control.cpp
 servo_qt_node/qt_servo_control.h
@@ -4791,10 +4771,6 @@ QtGui/qwindowdefs_win.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs_win.h
 QtGui/qtguiglobal.h
 -
-
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication
-qapplication.h
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QCommonStyle
 qcommonstyle.h
