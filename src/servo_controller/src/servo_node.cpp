@@ -1,35 +1,33 @@
-#include "servo_controller/ServoFeedback.h"  // 新增
+#include "servo_controller/ServoFeedback.h"
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include "servo_controller/servo.h"
+#include <map>
+#include <string>
 
-// 舵机最大力矩列表，单位 Nm（请根据实际情况填写）
-double servo_max_torque[10] = {
-    10.3, 10.3, 10.3, 10.3, 10.3, 10.3, 10.3, 10.3, 10.3, 10.3
-};
+// Max torque for each servo in Nm (adjust as needed)
+double servo_max_torque[10] = {10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3};
 
 std::map<int, Servo*> servo_map;
+std::map<int, int> target_positions;  // servo_id -> target encoder value
 
-// 弧度 -> 编码器值
 inline int rad2enc(double rad) {
     return static_cast<int>(rad / 3.14 * 2048.0 + 2048.0);
 }
 
-// 编码器值 -> 弧度
 inline double enc2rad(int enc) {
     return (enc - 2048) * 3.14 / 2048.0;
 }
 
-// 舵机 ID 映射 (JointState 索引 11~20 → 舵机 ID 1~10)
 int jointIndexToServoId(int idx) {
-    return idx - 10; // 11->1, 12->2, ..., 20->10
+    return idx - 10; // 11->1 ...
 }
 
 void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
-    ROS_INFO("收到控制指令消息，position大小=%lu", msg->position.size());
-    
+    ROS_INFO("Received control command, position size=%lu", msg->position.size());
+
     if (msg->position.size() < 21) {
-        ROS_WARN("JointState.position 长度不足 21");
+        ROS_WARN("JointState.position length less than 21");
         return;
     }
 
@@ -38,22 +36,10 @@ void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
         double target_rad = msg->position[idx];
         int target_enc = rad2enc(target_rad);
 
-        if (servo_map.find(servo_id) == servo_map.end()) {
-            try {
-                servo_map[servo_id] = new Servo(servo_id, "/dev/ttyUSB0", 0.1f, 0.01f, 0.05f);
-                ROS_INFO("创建并初始化舵机 ID=%d", servo_id);
-            } catch (const std::exception& e) {
-                ROS_ERROR("初始化舵机 ID=%d 失败: %s", servo_id, e.what());
-                continue;
-            }
-        }
+        // Just update the target position in the map
+        target_positions[servo_id] = target_enc;
 
-        Servo* servo = servo_map[servo_id];
-        servo->setSpeedMax(1000);
-        servo->setAcceleration(50);
-        servo->PID_setAngle_control(target_enc);
-
-        ROS_DEBUG("发送控制命令给舵机ID=%d, 目标角度(rad)=%.3f, 编码器值=%d", servo_id, target_rad, target_enc);
+        ROS_DEBUG("Updated target for servo ID=%d: angle(rad)=%.3f, encoder=%d", servo_id, target_rad, target_enc);
     }
 }
 
@@ -61,15 +47,42 @@ int main(int argc, char** argv) {
     ros::init(argc, argv, "servo_controller_node");
     ros::NodeHandle nh;
 
-    ROS_INFO("servo_controller_node 启动");
+    ROS_INFO("servo_controller_node started");
+
+    // Initialize all servos once
+    for (int id = 1; id <= 10; ++id) {
+        try {
+            servo_map[id] = new Servo(id, "/dev/ttyUSB0", 0.1f, 0.01f, 0.05f);
+            servo_map[id]->setSpeedMax(1000);
+            servo_map[id]->setAcceleration(50);
+            // Initialize target_positions with current pos to avoid jump
+            auto fb = servo_map[id]->get_feedback(id);
+            target_positions[id] = fb.pos;
+            ROS_INFO("Initialized servo ID=%d on /dev/ttyUSB0", id);
+        } catch (const std::exception& e) {
+            ROS_ERROR("Failed to initialize servo ID=%d: %s", id, e.what());
+        }
+    }
 
     ros::Subscriber sub = nh.subscribe("/command_joint_states", 10, commandCallback);
     ros::Publisher fb_pub = nh.advertise<sensor_msgs::JointState>("/feedback_feetech_joint_states", 10);
 
-    ros::Rate rate(50); // 50Hz 反馈频率
+    ros::Rate rate(50); // 50Hz
+
     while (ros::ok()) {
         ros::spinOnce();
 
+        // Send commands to all servos based on stored targets
+        for (auto& [id, servo] : servo_map) {
+            int target_enc = target_positions[id];
+            try {
+                servo->PID_setAngle_control(target_enc);
+            } catch (const std::exception& e) {
+                ROS_ERROR("Failed to send command to servo ID=%d: %s", id, e.what());
+            }
+        }
+
+        // Publish feedback
         sensor_msgs::JointState fb_msg;
         fb_msg.header.stamp = ros::Time::now();
         fb_msg.name.resize(10);
@@ -78,31 +91,24 @@ int main(int argc, char** argv) {
         fb_msg.effort.resize(10);
 
         for (int i = 0; i < 10; ++i) {
-            int servo_id = i + 1; // ID 1~10
-
+            int servo_id = i + 1;
             fb_msg.name[i] = "servo_" + std::to_string(servo_id);
 
             if (servo_map.find(servo_id) == servo_map.end()) {
-                // 如果没初始化，发0
                 fb_msg.position[i] = 0.0;
                 fb_msg.velocity[i] = 0.0;
                 fb_msg.effort[i] = 0.0;
-                ROS_WARN_THROTTLE(10, "舵机 ID=%d 未初始化，发送默认反馈值", servo_id);
+                ROS_WARN_THROTTLE(10, "Servo ID=%d not initialized, sending zero feedback", servo_id);
                 continue;
             }
 
             auto fb = servo_map[servo_id]->get_feedback(servo_id);
 
-            // 位置转弧度
             fb_msg.position[i] = enc2rad(fb.pos);
-
-            // 速度转弧度/秒 (假设speed单位与pos相同)
             fb_msg.velocity[i] = enc2rad(fb.speed);
-
-            // 力矩转换，fb.load单位是0.1%最大力矩，转换为 Nm
             fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
 
-            ROS_DEBUG("反馈：ID=%d pos=%.3f rad, speed=%.3f rad/s, effort=%.3f Nm",
+            ROS_DEBUG("Feedback: ID=%d pos=%.3f rad, speed=%.3f rad/s, effort=%.3f Nm",
                       servo_id, fb_msg.position[i], fb_msg.velocity[i], fb_msg.effort[i]);
         }
 
@@ -111,7 +117,7 @@ int main(int argc, char** argv) {
         rate.sleep();
     }
 
-    ROS_INFO("退出程序，清理资源");
+    ROS_INFO("Exiting and cleaning up");
     for (auto& pair : servo_map) {
         delete pair.second;
     }
