@@ -57,9 +57,8 @@ servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/ros/wall_timer.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/ros/wall_timer_options.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/rosconsole/macros_generated.h
-servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
-servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
-servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
+servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/sensor_msgs/JointState.h
+servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h

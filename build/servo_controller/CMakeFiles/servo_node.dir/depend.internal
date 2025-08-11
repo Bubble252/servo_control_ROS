@@ -58,9 +58,8 @@ servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o
  /opt/ros/noetic/include/ros/wall_timer.h
  /opt/ros/noetic/include/ros/wall_timer_options.h
  /opt/ros/noetic/include/rosconsole/macros_generated.h
- /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
- /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
- /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
+ /opt/ros/noetic/include/sensor_msgs/JointState.h
+ /opt/ros/noetic/include/std_msgs/Header.h
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h

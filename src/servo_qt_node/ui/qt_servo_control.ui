@@ -14,7 +14,7 @@
    <item>
     <widget class="QLabel" name="label1">
      <property name="text">
-      <string>Servo 1 Angle: 90</string>
+      <string>Servo 1 Angle (rad): 0.00</string>
      </property>
     </widget>
    </item>
@@ -24,20 +24,23 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="minimum">
-      <number>0</number>
+      <number>-314</number>
      </property>
      <property name="maximum">
-      <number>180</number>
+      <number>314</number>
      </property>
      <property name="value">
-      <number>90</number>
+      <number>0</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QLabel" name="label2">
      <property name="text">
-      <string>Servo 2 Angle: 90</string>
+      <string>Servo 2 Angle (rad): 0.00</string>
      </property>
     </widget>
    </item>
@@ -47,16 +50,21 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="minimum">
-      <number>0</number>
+      <number>-314</number>
      </property>
      <property name="maximum">
-      <number>180</number>
+      <number>314</number>
      </property>
      <property name="value">
-      <number>90</number>
+      <number>0</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
      </property>
     </widget>
    </item>
+
+   <!-- 位置图占位 -->
    <item>
     <widget class="QWidget" name="positionChartPlaceholder">
      <property name="minimumHeight">
@@ -66,10 +74,12 @@
       <string>background-color: #f0f0f0; border: 1px solid #ccc;</string>
      </property>
      <property name="toolTip">
-      <string>Position Chart Placeholder</string>
+      <string>Position Chart Placeholder (rad)</string>
      </property>
     </widget>
    </item>
+
+   <!-- 速度图占位 -->
    <item>
     <widget class="QWidget" name="speedChartPlaceholder">
      <property name="minimumHeight">
@@ -79,12 +89,14 @@
       <string>background-color: #f0f0f0; border: 1px solid #ccc;</string>
      </property>
      <property name="toolTip">
-      <string>Speed Chart Placeholder</string>
+      <string>Speed Chart Placeholder (rad/s)</string>
      </property>
     </widget>
    </item>
+
+   <!-- 电流图占位 -->
    <item>
-    <widget class="QWidget" name="currentChartPlaceholder">
+    <widget class="QWidget" name="effortChartPlaceholder">
      <property name="minimumHeight">
       <number>150</number>
      </property>
@@ -92,10 +104,11 @@
       <string>background-color: #f0f0f0; border: 1px solid #ccc;</string>
      </property>
      <property name="toolTip">
-      <string>Current Chart Placeholder</string>
+      <string>Current Chart Placeholder (A)</string>
      </property>
     </widget>
    </item>
+
   </layout>
  </widget>
  <resources/>

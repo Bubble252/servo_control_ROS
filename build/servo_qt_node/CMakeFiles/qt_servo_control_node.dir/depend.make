@@ -57,6 +57,8 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/ros/wall_timer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/ros/wall_timer_options.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/rosconsole/macros_generated.h
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/sensor_msgs/JointState.h
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
@@ -64,7 +66,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: servo_qt_node/qt_servo_control_node_autogen/KB7GKGVG4R/moc_qt_servo_control.cpp
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: servo_qt_node/qt_servo_control_node_autogen/mocs_compilation.cpp
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractSeries
@@ -86,9 +87,7 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCharts/qxyseries.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QMargins
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QtGlobal
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h
@@ -97,7 +96,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_msvc.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h
@@ -156,7 +154,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qsystemdetection.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtextstream.h
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qurlquery.h
@@ -273,12 +270,13 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noet
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/ros/wall_timer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/ros/wall_timer_options.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/rosconsole/macros_generated.h
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/sensor_msgs/JointState.h
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/main.cpp
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
@@ -301,9 +299,7 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCharts/qxyseries.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QMargins
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QtGlobal
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h
@@ -312,7 +308,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_msvc.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h
@@ -373,7 +368,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qsystemdetection.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtextstream.h
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qurlquery.h
@@ -495,12 +489,13 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/ros/wall_timer.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/ros/wall_timer_options.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/rosconsole/macros_generated.h
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/sensor_msgs/JointState.h
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/qt_servo_control.cpp
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
@@ -597,7 +592,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QStringList
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant
-servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QtCore
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QtCoreDepends
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QtGlobal
@@ -920,6 +914,7 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLayout
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollerProperties
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSlider
+servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QVBoxLayout
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QtWidgets
 servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QtWidgetsDepends

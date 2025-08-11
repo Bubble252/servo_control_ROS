@@ -58,6 +58,8 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
  /opt/ros/noetic/include/ros/wall_timer.h
  /opt/ros/noetic/include/ros/wall_timer_options.h
  /opt/ros/noetic/include/rosconsole/macros_generated.h
+ /opt/ros/noetic/include/sensor_msgs/JointState.h
+ /opt/ros/noetic/include/std_msgs/Header.h
  /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
  /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
  /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
@@ -65,7 +67,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/qt_servo_control_node_autogen/KB7GKGVG4R/moc_qt_servo_control.cpp
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/qt_servo_control_node_autogen/mocs_compilation.cpp
- /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
  /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
  /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractSeries
@@ -87,9 +88,7 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
  /usr/include/x86_64-linux-gnu/qt5/QtCharts/qxyseries.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QMargins
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject
- /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant
- /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QtGlobal
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h
@@ -98,7 +97,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_msvc.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h
@@ -157,7 +155,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/qt_servo_control_node_autogen
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qsystemdetection.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtextstream.h
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qurlquery.h
@@ -274,12 +271,13 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o
  /opt/ros/noetic/include/ros/wall_timer.h
  /opt/ros/noetic/include/ros/wall_timer_options.h
  /opt/ros/noetic/include/rosconsole/macros_generated.h
+ /opt/ros/noetic/include/sensor_msgs/JointState.h
+ /opt/ros/noetic/include/std_msgs/Header.h
  /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
  /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
  /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
- /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/main.cpp
  /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
@@ -302,9 +300,7 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCharts/qxyseries.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QMargins
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject
- /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant
- /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QtGlobal
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h
@@ -313,7 +309,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_cxx11.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic_msvc.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasicatomic.h
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearray.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbytearraylist.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qchar.h
@@ -374,7 +369,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qsystemdetection.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtcore-config.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtextstream.h
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtypeinfo.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qurlquery.h
@@ -496,12 +490,13 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o
  /opt/ros/noetic/include/ros/wall_timer.h
  /opt/ros/noetic/include/ros/wall_timer_options.h
  /opt/ros/noetic/include/rosconsole/macros_generated.h
+ /opt/ros/noetic/include/sensor_msgs/JointState.h
+ /opt/ros/noetic/include/std_msgs/Header.h
  /opt/ros/noetic/include/std_msgs/Int32MultiArray.h
  /opt/ros/noetic/include/std_msgs/MultiArrayDimension.h
  /opt/ros/noetic/include/std_msgs/MultiArrayLayout.h
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
  /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
- /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include/servo_qt_node/qt_servo_control.h
  /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/src/qt_servo_control.cpp
  /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
@@ -598,7 +593,6 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QStringList
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant
- /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QtCore
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QtCoreDepends
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QtGlobal
@@ -921,6 +915,7 @@ servo_qt_node/CMakeFiles/qt_servo_control_node.dir/src/qt_servo_control.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLayout
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QScrollerProperties
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSlider
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QVBoxLayout
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QtWidgets
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QtWidgetsDepends
