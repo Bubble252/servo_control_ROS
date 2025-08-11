@@ -1,4 +1,3 @@
-
 #include "servo_controller/ServoFeedback.h"  // 新增
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
@@ -27,6 +26,8 @@ int jointIndexToServoId(int idx) {
 }
 
 void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
+    ROS_INFO("收到控制指令消息，position大小=%lu", msg->position.size());
+    
     if (msg->position.size() < 21) {
         ROS_WARN("JointState.position 长度不足 21");
         return;
@@ -51,12 +52,16 @@ void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
         servo->setSpeedMax(1000);
         servo->setAcceleration(50);
         servo->PID_setAngle_control(target_enc);
+
+        ROS_DEBUG("发送控制命令给舵机ID=%d, 目标角度(rad)=%.3f, 编码器值=%d", servo_id, target_rad, target_enc);
     }
 }
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "servo_controller_node");
     ros::NodeHandle nh;
+
+    ROS_INFO("servo_controller_node 启动");
 
     ros::Subscriber sub = nh.subscribe("/command_joint_states", 10, commandCallback);
     ros::Publisher fb_pub = nh.advertise<sensor_msgs::JointState>("/feedback_feetech_joint_states", 10);
@@ -82,6 +87,7 @@ int main(int argc, char** argv) {
                 fb_msg.position[i] = 0.0;
                 fb_msg.velocity[i] = 0.0;
                 fb_msg.effort[i] = 0.0;
+                ROS_WARN_THROTTLE(10, "舵机 ID=%d 未初始化，发送默认反馈值", servo_id);
                 continue;
             }
 
@@ -95,12 +101,17 @@ int main(int argc, char** argv) {
 
             // 力矩转换，fb.load单位是0.1%最大力矩，转换为 Nm
             fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
+
+            ROS_DEBUG("反馈：ID=%d pos=%.3f rad, speed=%.3f rad/s, effort=%.3f Nm",
+                      servo_id, fb_msg.position[i], fb_msg.velocity[i], fb_msg.effort[i]);
         }
 
         fb_pub.publish(fb_msg);
+
         rate.sleep();
     }
 
+    ROS_INFO("退出程序，清理资源");
     for (auto& pair : servo_map) {
         delete pair.second;
     }

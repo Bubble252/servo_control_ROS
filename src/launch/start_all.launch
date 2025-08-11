@@ -1,8 +1,11 @@
 <launch>
     <!-- 启动 servo_controller 包中的 servo_node -->
-    <node pkg="servo_controller" type="servo_node" name="servo_node" output="screen" />
+    <node pkg="servo_controller" type="servo_node" name="servo_node" output="screen">
+        <param name="port" value="/dev/ttyUSB0"/>
+    </node>
 
-    <!-- 启动 servo_qt_node 包中的 qt_servo_control_node 前面是包名 后面是节点名 -->
+    <!-- 启动 servo_qt_node 包中的 qt_servo_control_node -->
     <node pkg="servo_qt_node" type="qt_servo_control_node" name="qt_servo_control_node" output="screen" />
 </launch>
+
 

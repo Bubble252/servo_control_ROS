@@ -11,7 +11,7 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     : QWidget(parent), nh_(nh)
 {
     // 发布舵机目标角度，消息格式: JointState 长度21，索引11~20有效，对应舵机ID1~10
-    pub_joint_state_ = nh_.advertise<sensor_msgs::JointState>("servo_target_joint_states", 10);
+    pub_joint_state_ = nh_.advertise<sensor_msgs::JointState>("/command_joint_states", 10);
 
     // 订阅反馈
     fb_sub_ = nh_.subscribe("/feedback_feetech_joint_states", 100, &QtServoControl::feedbackCallback, this);
