@@ -33,10 +33,17 @@ private slots:
     void updateCharts();
 
 private:
+
+// 在 QtServoControl 类里 private 成员区添加：
+QtCharts::QChartView* chartView_pos_;
+QtCharts::QChartView* chartView_speed_;
+QtCharts::QChartView* chartView_current_;
+
+    void publishJointStateTargets();
     void feedbackCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
-    ros::NodeHandle& nh_;
-    ros::Publisher pub_;
+    ros::NodeHandle nh_;
+    ros::Publisher pub_joint_state_;
     ros::Subscriber fb_sub_;
 
     QLabel* label1_;
@@ -58,12 +65,12 @@ private:
     QtCharts::QValueAxis* axisX_current_;
     QtCharts::QValueAxis* axisY_current_;
 
-    QtCharts::QChartView* chartView_pos_;
-    QtCharts::QChartView* chartView_speed_;
-    QtCharts::QChartView* chartView_current_;
+    double target_angle_1_ = 0.0;
+    double target_angle_2_ = 0.0;
+
+    static constexpr int maxDataCount = 100;
 
     std::map<int, FeedbackData> feedbackData_;
-    static constexpr int maxDataCount = 100;
 };
 
 #endif // QT_SERVO_CONTROL_H

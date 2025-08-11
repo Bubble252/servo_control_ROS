@@ -5,12 +5,13 @@
 #include <QLabel>
 #include <QSlider>
 #include <cmath>
+#include <sensor_msgs/JointState.h>
 
 QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     : QWidget(parent), nh_(nh)
 {
-    // 发布舵机目标角度，消息格式: id + value (单位弧度*100)
-    pub_ = nh_.advertise<std_msgs::Int32MultiArray>("servo_target", 10);
+    // 发布舵机目标角度，消息格式: JointState 长度21，索引11~20有效，对应舵机ID1~10
+    pub_joint_state_ = nh_.advertise<sensor_msgs::JointState>("servo_target_joint_states", 10);
 
     // 订阅反馈
     fb_sub_ = nh_.subscribe("/feedback_feetech_joint_states", 100, &QtServoControl::feedbackCallback, this);
@@ -140,19 +141,36 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
 QtServoControl::~QtServoControl() {}
 
 void QtServoControl::onSlider1Changed(int value) {
-    double rad = value / 100.0;
-    label1_->setText(QString("Servo 1 Angle (rad): %1").arg(rad, 0, 'f', 2));
-    std_msgs::Int32MultiArray msg;
-    msg.data = {1, value};
-    pub_.publish(msg);
+    target_angle_1_ = value / 100.0;
+    label1_->setText(QString("Servo 1 Angle (rad): %1").arg(target_angle_1_, 0, 'f', 2));
+    publishJointStateTargets();
 }
 
 void QtServoControl::onSlider2Changed(int value) {
-    double rad = value / 100.0;
-    label2_->setText(QString("Servo 2 Angle (rad): %1").arg(rad, 0, 'f', 2));
-    std_msgs::Int32MultiArray msg;
-    msg.data = {2, value};
-    pub_.publish(msg);
+    target_angle_2_ = value / 100.0;
+    label2_->setText(QString("Servo 2 Angle (rad): %1").arg(target_angle_2_, 0, 'f', 2));
+    publishJointStateTargets();
+}
+
+void QtServoControl::publishJointStateTargets() {
+    sensor_msgs::JointState msg;
+    msg.name.resize(21);
+    msg.position.resize(21);
+
+    // 置0
+    for (int i = 0; i < 21; ++i) {
+        msg.name[i] = "";
+        msg.position[i] = 0.0;
+    }
+
+    // 第11和12索引对应舵机1和舵机2
+    msg.name[10] = "servo_1";
+    msg.name[11] = "servo_2";
+
+    msg.position[10] = target_angle_1_;
+    msg.position[11] = target_angle_2_;
+
+    pub_joint_state_.publish(msg);
 }
 
 void QtServoControl::rosSpin() {
@@ -160,7 +178,7 @@ void QtServoControl::rosSpin() {
 }
 
 void QtServoControl::feedbackCallback(const sensor_msgs::JointState::ConstPtr& msg) {
-    for (size_t i = 0; i < 2; ++i) {  // 注意这里用 size_t
+    for (size_t i = 0; i < 2; ++i) {
         int id = static_cast<int>(i) + 1;
         if (feedbackData_.find(id) == feedbackData_.end()) {
             feedbackData_[id] = FeedbackData();
@@ -180,7 +198,6 @@ void QtServoControl::feedbackCallback(const sensor_msgs::JointState::ConstPtr& m
         }
     }
 }
-
 
 void QtServoControl::updateCharts() {
     series_pos_1_->clear();
