@@ -661,6 +661,32 @@ servo_controller_genpy/fast:
 	$(MAKE) -f servo_controller/CMakeFiles/servo_controller_genpy.dir/build.make servo_controller/CMakeFiles/servo_controller_genpy.dir/build
 .PHONY : servo_controller_genpy/fast
 
+#=============================================================================
+# Target rules for targets named qt_servo_control_node
+
+# Build rule for target.
+qt_servo_control_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 qt_servo_control_node
+.PHONY : qt_servo_control_node
+
+# fast build rule for target.
+qt_servo_control_node/fast:
+	$(MAKE) -f servo_qt_node/CMakeFiles/qt_servo_control_node.dir/build.make servo_qt_node/CMakeFiles/qt_servo_control_node.dir/build
+.PHONY : qt_servo_control_node/fast
+
+#=============================================================================
+# Target rules for targets named qt_servo_control_node_autogen
+
+# Build rule for target.
+qt_servo_control_node_autogen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 qt_servo_control_node_autogen
+.PHONY : qt_servo_control_node_autogen
+
+# fast build rule for target.
+qt_servo_control_node_autogen/fast:
+	$(MAKE) -f servo_qt_node/CMakeFiles/qt_servo_control_node_autogen.dir/build.make servo_qt_node/CMakeFiles/qt_servo_control_node_autogen.dir/build
+.PHONY : qt_servo_control_node_autogen/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -712,6 +738,8 @@ help:
 	@echo "... servo_lib"
 	@echo "... servo_controller_generate_messages_py"
 	@echo "... servo_controller_genpy"
+	@echo "... qt_servo_control_node"
+	@echo "... qt_servo_control_node_autogen"
 .PHONY : help
 
 

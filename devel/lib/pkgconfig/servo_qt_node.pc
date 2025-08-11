@@ -1,0 +1,8 @@
+prefix=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel
+
+Name: servo_qt_node
+Description: Description of servo_qt_node
+Version: 0.0.1
+Cflags: -I/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node/include
+Libs: -L${prefix}/lib 
+Requires: roscpp std_msgs message_runtime servo_controller

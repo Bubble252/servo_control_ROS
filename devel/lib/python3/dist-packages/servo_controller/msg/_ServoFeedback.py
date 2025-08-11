@@ -8,22 +8,22 @@ import struct
 
 
 class ServoFeedback(genpy.Message):
-  _md5sum = "1a521aa655c317a35ffe9a7574584938"
+  _md5sum = "b6277abd33d2a3e7b9b52cee4d8bf6c9"
   _type = "servo_controller/ServoFeedback"
   _has_header = False  # flag to mark the presence of a Header object
   _full_text = """int32 id
-float32 pos
-float32 speed
-float32 current
-float32 load
-float32 voltage
-float32 temper
+int32 pos
+int32 speed
+int32 current
+int32 load
+int32 voltage
+int32 temper
 bool move
 bool success
 
 """
   __slots__ = ['id','pos','speed','current','load','voltage','temper','move','success']
-  _slot_types = ['int32','float32','float32','float32','float32','float32','float32','bool','bool']
+  _slot_types = ['int32','int32','int32','int32','int32','int32','int32','bool','bool']
 
   def __init__(self, *args, **kwds):
     """
@@ -45,29 +45,29 @@ bool success
       if self.id is None:
         self.id = 0
       if self.pos is None:
-        self.pos = 0.
+        self.pos = 0
       if self.speed is None:
-        self.speed = 0.
+        self.speed = 0
       if self.current is None:
-        self.current = 0.
+        self.current = 0
       if self.load is None:
-        self.load = 0.
+        self.load = 0
       if self.voltage is None:
-        self.voltage = 0.
+        self.voltage = 0
       if self.temper is None:
-        self.temper = 0.
+        self.temper = 0
       if self.move is None:
         self.move = False
       if self.success is None:
         self.success = False
     else:
       self.id = 0
-      self.pos = 0.
-      self.speed = 0.
-      self.current = 0.
-      self.load = 0.
-      self.voltage = 0.
-      self.temper = 0.
+      self.pos = 0
+      self.speed = 0
+      self.current = 0
+      self.load = 0
+      self.voltage = 0
+      self.temper = 0
       self.move = False
       self.success = False
 
@@ -84,7 +84,7 @@ bool success
     """
     try:
       _x = self
-      buff.write(_get_struct_i6f2B().pack(_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success))
+      buff.write(_get_struct_7i2B().pack(_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -100,7 +100,7 @@ bool success
       _x = self
       start = end
       end += 30
-      (_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success,) = _get_struct_i6f2B().unpack(str[start:end])
+      (_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success,) = _get_struct_7i2B().unpack(str[start:end])
       self.move = bool(self.move)
       self.success = bool(self.success)
       return self
@@ -116,7 +116,7 @@ bool success
     """
     try:
       _x = self
-      buff.write(_get_struct_i6f2B().pack(_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success))
+      buff.write(_get_struct_7i2B().pack(_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success))
     except struct.error as se: self._check_types(struct.error("%s: '%s' when writing '%s'" % (type(se), str(se), str(locals().get('_x', self)))))
     except TypeError as te: self._check_types(ValueError("%s: '%s' when writing '%s'" % (type(te), str(te), str(locals().get('_x', self)))))
 
@@ -133,7 +133,7 @@ bool success
       _x = self
       start = end
       end += 30
-      (_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success,) = _get_struct_i6f2B().unpack(str[start:end])
+      (_x.id, _x.pos, _x.speed, _x.current, _x.load, _x.voltage, _x.temper, _x.move, _x.success,) = _get_struct_7i2B().unpack(str[start:end])
       self.move = bool(self.move)
       self.success = bool(self.success)
       return self
@@ -144,9 +144,9 @@ _struct_I = genpy.struct_I
 def _get_struct_I():
     global _struct_I
     return _struct_I
-_struct_i6f2B = None
-def _get_struct_i6f2B():
-    global _struct_i6f2B
-    if _struct_i6f2B is None:
-        _struct_i6f2B = struct.Struct("<i6f2B")
-    return _struct_i6f2B
+_struct_7i2B = None
+def _get_struct_7i2B():
+    global _struct_7i2B
+    if _struct_7i2B is None:
+        _struct_7i2B = struct.Struct("<7i2B")
+    return _struct_7i2B

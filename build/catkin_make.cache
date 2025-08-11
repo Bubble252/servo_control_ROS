@@ -1,2 +1,2 @@
-servo_controller
+servo_controller:servo_qt_node
 -DCATKIN_DEVEL_PREFIX=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel -DCMAKE_INSTALL_PREFIX=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/install -G Unix Makefiles

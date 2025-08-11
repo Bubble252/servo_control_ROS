@@ -69,3 +69,22 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/python3/dist-packages" TYPE DIRECTORY FILES "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/lib/python3/dist-packages/servo_controller")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_controller/catkin_generated/installspace/servo_controller.pc")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/servo_controller/cmake" TYPE FILE FILES "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_controller/catkin_generated/installspace/servo_controller-msg-extras.cmake")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/servo_controller/cmake" TYPE FILE FILES
+    "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_controller/catkin_generated/installspace/servo_controllerConfig.cmake"
+    "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_controller/catkin_generated/installspace/servo_controllerConfig-version.cmake"
+    )
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/servo_controller" TYPE FILE FILES "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_controller/package.xml")
+endif()
+

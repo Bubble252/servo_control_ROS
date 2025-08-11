@@ -147,6 +147,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/gtest/cmake_install.cmake")
   include("/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_controller/cmake_install.cmake")
+  include("/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node/cmake_install.cmake")
 
 endif()
 

@@ -25,23 +25,23 @@ struct ServoFeedback_
 
   ServoFeedback_()
     : id(0)
-    , pos(0.0)
-    , speed(0.0)
-    , current(0.0)
-    , load(0.0)
-    , voltage(0.0)
-    , temper(0.0)
+    , pos(0)
+    , speed(0)
+    , current(0)
+    , load(0)
+    , voltage(0)
+    , temper(0)
     , move(false)
     , success(false)  {
     }
   ServoFeedback_(const ContainerAllocator& _alloc)
     : id(0)
-    , pos(0.0)
-    , speed(0.0)
-    , current(0.0)
-    , load(0.0)
-    , voltage(0.0)
-    , temper(0.0)
+    , pos(0)
+    , speed(0)
+    , current(0)
+    , load(0)
+    , voltage(0)
+    , temper(0)
     , move(false)
     , success(false)  {
   (void)_alloc;
@@ -52,22 +52,22 @@ struct ServoFeedback_
    typedef int32_t _id_type;
   _id_type id;
 
-   typedef float _pos_type;
+   typedef int32_t _pos_type;
   _pos_type pos;
 
-   typedef float _speed_type;
+   typedef int32_t _speed_type;
   _speed_type speed;
 
-   typedef float _current_type;
+   typedef int32_t _current_type;
   _current_type current;
 
-   typedef float _load_type;
+   typedef int32_t _load_type;
   _load_type load;
 
-   typedef float _voltage_type;
+   typedef int32_t _voltage_type;
   _voltage_type voltage;
 
-   typedef float _temper_type;
+   typedef int32_t _temper_type;
   _temper_type temper;
 
    typedef uint8_t _move_type;
@@ -170,12 +170,12 @@ struct MD5Sum< ::servo_controller::ServoFeedback_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "1a521aa655c317a35ffe9a7574584938";
+    return "b6277abd33d2a3e7b9b52cee4d8bf6c9";
   }
 
   static const char* value(const ::servo_controller::ServoFeedback_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x1a521aa655c317a3ULL;
-  static const uint64_t static_value2 = 0x5ffe9a7574584938ULL;
+  static const uint64_t static_value1 = 0xb6277abd33d2a3e7ULL;
+  static const uint64_t static_value2 = 0xb9b52cee4d8bf6c9ULL;
 };
 
 template<class ContainerAllocator>
@@ -195,12 +195,12 @@ struct Definition< ::servo_controller::ServoFeedback_<ContainerAllocator> >
   static const char* value()
   {
     return "int32 id\n"
-"float32 pos\n"
-"float32 speed\n"
-"float32 current\n"
-"float32 load\n"
-"float32 voltage\n"
-"float32 temper\n"
+"int32 pos\n"
+"int32 speed\n"
+"int32 current\n"
+"int32 load\n"
+"int32 voltage\n"
+"int32 temper\n"
 "bool move\n"
 "bool success\n"
 "\n"
@@ -256,27 +256,27 @@ struct Printer< ::servo_controller::ServoFeedback_<ContainerAllocator> >
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "pos: ";
-    Printer<float>::stream(s, indent + "  ", v.pos);
+    Printer<int32_t>::stream(s, indent + "  ", v.pos);
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "speed: ";
-    Printer<float>::stream(s, indent + "  ", v.speed);
+    Printer<int32_t>::stream(s, indent + "  ", v.speed);
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "current: ";
-    Printer<float>::stream(s, indent + "  ", v.current);
+    Printer<int32_t>::stream(s, indent + "  ", v.current);
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "load: ";
-    Printer<float>::stream(s, indent + "  ", v.load);
+    Printer<int32_t>::stream(s, indent + "  ", v.load);
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "voltage: ";
-    Printer<float>::stream(s, indent + "  ", v.voltage);
+    Printer<int32_t>::stream(s, indent + "  ", v.voltage);
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "temper: ";
-    Printer<float>::stream(s, indent + "  ", v.temper);
+    Printer<int32_t>::stream(s, indent + "  ", v.temper);
     if (true || !indent.empty())
       s << std::endl;
     s << indent << "move: ";

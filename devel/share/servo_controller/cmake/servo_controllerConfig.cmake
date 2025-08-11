@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(servo_controller_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include " STREQUAL " ")
+if(NOT "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include;/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_controller/include " STREQUAL " ")
   set(servo_controller_INCLUDE_DIRS "")
-  set(_include_dirs "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include")
+  set(_include_dirs "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include;/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_controller/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -116,7 +116,7 @@ if(NOT "/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include " STREQUAL 
   endforeach()
 endif()
 
-set(libraries "")
+set(libraries "servo_lib")
 foreach(library ${libraries})
   # keep build configuration keywords, generator expressions, target names, and absolute libraries as-is
   if("${library}" MATCHES "^(debug|optimized|general)$")

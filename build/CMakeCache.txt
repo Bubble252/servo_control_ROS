@@ -367,6 +367,21 @@ Project_BINARY_DIR:STATIC=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src
 
+//The directory containing a CMake configuration file for Qt5Charts.
+Qt5Charts_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Charts
+
+//The directory containing a CMake configuration file for Qt5Core.
+Qt5Core_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Core
+
+//The directory containing a CMake configuration file for Qt5Gui.
+Qt5Gui_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui
+
+//The directory containing a CMake configuration file for Qt5Widgets.
+Qt5Widgets_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets
+
+//The directory containing a CMake configuration file for Qt5.
+Qt5_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5
+
 //Path to a library.
 RT_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/librt.so
 
@@ -494,8 +509,17 @@ rostime_DIR:PATH=/opt/ros/noetic/share/rostime/cmake
 //Value Computed by CMake
 servo_controller_BINARY_DIR:STATIC=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_controller
 
+//The directory containing a CMake configuration file for servo_controller.
+servo_controller_DIR:PATH=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/share/servo_controller/cmake
+
 //Value Computed by CMake
 servo_controller_SOURCE_DIR:STATIC=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_controller
+
+//Value Computed by CMake
+servo_qt_node_BINARY_DIR:STATIC=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/build/servo_qt_node
+
+//Value Computed by CMake
+servo_qt_node_SOURCE_DIR:STATIC=/root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_qt_node
 
 //The directory containing a CMake configuration file for std_msgs.
 std_msgs_DIR:PATH=/opt/ros/noetic/share/std_msgs/cmake
@@ -651,7 +675,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
