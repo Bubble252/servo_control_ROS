@@ -89,11 +89,45 @@ int main(int argc, char** argv) {
     // 发布舵机反馈话题
     ros::Publisher fb_pub = nh.advertise<sensor_msgs::JointState>("/feedback_feetech_joint_states", 10);
 
-    ros::Rate rate(200); // 循环频率 200Hz
+    ros::Rate rate(100); // 循环频率 100Hz
+    
+    // 在main函数的主循环前定义计时变量
+	ros::Time last_cycle_time = ros::Time::now();
+	static int cycle_count = 0;  // 用于累计周期数
+	static double total_cycle_time = 0.0;  // 累计总周期时间
 
 // ------------------- 主循环 -------------------
 while (ros::ok()) {
     ros::spinOnce();
+    
+    
+    
+    
+    
+        // --------------- 新增：计算循环频率 ---------------
+    ros::Time current_time = ros::Time::now();
+    ros::Duration cycle_duration = current_time - last_cycle_time;
+    last_cycle_time = current_time;
+
+    // 累计周期时间，每3个周期计算一次平均频率（减少打印开销）
+    total_cycle_time += cycle_duration.toSec();
+    cycle_count++;
+    if (cycle_count >= 3) {
+        double avg_period = total_cycle_time / cycle_count;
+        double avg_freq = 1.0 / avg_period;
+        ROS_INFO("Average control frequency: %.2f Hz (period: %.3f ms)", 
+                 avg_freq, avg_period * 1000);
+        cycle_count = 0;
+        total_cycle_time = 0.0;
+    }
+    // --------------------------------------------------
+    
+    
+    
+    
+    
+    
+    
 
     // 每秒打印一次 target_positions（编码器值和弧度）
     static double last_print_time = 0.0;
