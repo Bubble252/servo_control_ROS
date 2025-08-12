@@ -7,6 +7,8 @@
 #include <cmath>
 #include <sensor_msgs/JointState.h>
 #include <ros/ros.h>  // 加这个用于ROS日志
+#include <sstream>    // 用于格式化调试字符串
+#include <iomanip>    // 用于 setprecision
 
 QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     : QWidget(parent), nh_(nh)
@@ -23,10 +25,10 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
 
     slider1_ = new QSlider(Qt::Horizontal);
     slider1_->setRange(-314, 314);
-    slider1_->setValue(-268);
+    slider1_->setValue(0);
     slider2_ = new QSlider(Qt::Horizontal);
     slider2_->setRange(-314, 314);
-    slider2_->setValue(-16);
+    slider2_->setValue(0);
 
     connect(slider1_, &QSlider::valueChanged, this, &QtServoControl::onSlider1Changed);
     connect(slider2_, &QSlider::valueChanged, this, &QtServoControl::onSlider2Changed);
@@ -120,36 +122,66 @@ void QtServoControl::onSlider1Changed(int value) {
     target_angle_1_ = value / 100.0;
     label1_->setText(QString("Servo 1 Angle (rad): %1").arg(target_angle_1_, 0, 'f', 2));
     ROS_INFO("Slider1 changed: target_angle_1_ = %f", target_angle_1_);
-    publishJointStateTargets();
+    publishJointStateTargets(); // 每次滑动立即打包并发布命令（并在内部打印）
 }
 
 void QtServoControl::onSlider2Changed(int value) {
     target_angle_2_ = value / 100.0;
     label2_->setText(QString("Servo 2 Angle (rad): %1").arg(target_angle_2_, 0, 'f', 2));
     ROS_INFO("Slider2 changed: target_angle_2_ = %f", target_angle_2_);
-    publishJointStateTargets();
+    publishJointStateTargets(); // 每次滑动立即打包并发布命令（并在内部打印）
 }
 
 void QtServoControl::publishJointStateTargets() {
+    // ---------------- 重要说明（必须理解） ----------------
+    // 在你的另一段控制端代码（servo_controller_node）中，那个节点
+    // 期望从 /command_joint_states 读取的位置数组：position[11..20] -> 舵机ID 1..10
+    // (jointIndexToServoId(idx) = idx - 10)
+    // 因此这里我们把 servo_1、servo_2 的目标放在 position[11] 和 position[12]。
+    // -----------------------------------------------------
+
     sensor_msgs::JointState msg;
+    msg.header.stamp = ros::Time::now();
+
+    // 保证大小至少 21（索引 0..20），这样索引 11/12 可直接访问
     msg.name.resize(21);
     msg.position.resize(21);
 
-    // 清零
+    // 先清零/清名（保证没有脏数据）
     for (int i = 0; i < 21; ++i) {
         msg.name[i] = "";
         msg.position[i] = 0.0;
     }
 
-    msg.name[10] = "servo_1";
-    msg.name[11] = "servo_2";
+    // 把我们关心的两个舵机放到 servo_controller_node 期待的位置索引：
+    // position[11] -> servo_1 (ID 1)
+    // position[12] -> servo_2 (ID 2)
+    msg.name[11] = "servo_1";
+    msg.name[12] = "servo_2";
 
-    //msg.position[10] = target_angle_1_;
-    msg.position[11] = target_angle_2_;
+    msg.position[11] = target_angle_1_; // rad
+    msg.position[12] = target_angle_2_; // rad
 
+    // 发布控制命令到 /command_joint_states
     pub_joint_state_.publish(msg);
 
-    ROS_INFO("Published JointState targets: servo_1=%.3f rad, servo_2=%.3f rad", target_angle_1_, target_angle_2_);
+    // -------- 打印（调试输出） --------
+    // 1) 简洁日志：指明关键索引的弧度值
+    ROS_INFO("Published /command_joint_states: idx11(servo_1)=%.3f rad, idx12(servo_2)=%.3f rad",
+             target_angle_1_, target_angle_2_);
+
+    // 2) 一行打印索引 11..20 的全部 target（方便与 servo_controller 的期望索引对应）
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(3);
+    oss << "[targets idx11..20] ";
+    for (int idx = 11; idx <= 20; ++idx) {
+        oss << idx << ":" << msg.position[idx];
+        if (idx < 20) oss << "  ";
+    }
+    ROS_INFO_STREAM(oss.str());
+
+    // 额外说明（可删）：如果你想以编码器值发送（servo_controller 那边用的是弧度），
+    // 在这里可以调用 rad->encoder 的转换并把编码器值放入 message（但目前 servo_controller 期望弧度）。
 }
 
 void QtServoControl::rosSpin() {

@@ -801,6 +801,10 @@ sensor_msgs/JointState.h
 -
 ros/ros.h
 -
+sstream
+-
+iomanip
+-
 
 /usr/include/x86_64-linux-gnu/qt5/QtCharts/QAbstractAxis
 qabstractaxis.h

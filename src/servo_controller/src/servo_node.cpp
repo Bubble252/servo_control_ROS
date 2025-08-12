@@ -3,43 +3,58 @@
 #include <sensor_msgs/JointState.h>
 #include "servo_controller/servo.h"
 #include <map>
+#include <sstream>
+#include <iomanip>
+
 #include <string>
 
-// Max torque for each servo in Nm (adjust as needed)
+// 每个舵机的最大扭矩（单位：Nm），用于反馈计算
 double servo_max_torque[10] = {10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3};
 
+// 保存舵机对象的map： key=舵机ID, value=Servo类指针
 std::map<int, Servo*> servo_map;
-std::map<int, int> target_positions;  // servo_id -> target encoder value
 
+// 保存目标位置的map： key=舵机ID, value=目标编码器值
+std::map<int, int> target_positions;  
+
+// 弧度转编码器值
 inline int rad2enc(double rad) {
     return static_cast<int>(rad / 3.14 * 2048.0 + 2048.0);
 }
 
+// 编码器值转弧度
 inline double enc2rad(int enc) {
     return (enc - 2048) * 3.14 / 2048.0;
 }
 
+// 将JointState消息中的关节索引转成舵机ID
+// 例如 JointState[11] -> 舵机ID 1
 int jointIndexToServoId(int idx) {
-    return idx - 10; // 11->1 ...
+    return idx - 10; 
 }
 
+// ------------------- 接收控制指令的回调 -------------------
+// 当有新的 /command_joint_states 消息时，这个函数会被调用
 void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ROS_INFO("Received control command, position size=%lu", msg->position.size());
 
+    // 如果指令长度不够，就直接忽略
     if (msg->position.size() < 21) {
         ROS_WARN("JointState.position length less than 21");
         return;
     }
 
+    // 遍历关节索引 11~20（即舵机 1~10）
     for (int idx = 11; idx <= 20; ++idx) {
         int servo_id = jointIndexToServoId(idx);
-        double target_rad = msg->position[idx];
-        int target_enc = rad2enc(target_rad);
+        double target_rad = msg->position[idx];    // 目标弧度
+        int target_enc = rad2enc(target_rad);      // 转成编码器值
 
-        // Just update the target position in the map
+        // 更新目标位置（不会立即发给舵机）
         target_positions[servo_id] = target_enc;
 
-        ROS_DEBUG("Updated target for servo ID=%d: angle(rad)=%.3f, encoder=%d", servo_id, target_rad, target_enc);
+        ROS_DEBUG("Updated target for servo ID=%d: angle(rad)=%.3f, encoder=%d", 
+                  servo_id, target_rad, target_enc);
     }
 }
 
@@ -49,98 +64,124 @@ int main(int argc, char** argv) {
 
     ROS_INFO("servo_controller_node started");
 
-    // Initialize all servos once
+    // ------------------- 舵机初始化 -------------------
     for (int id = 1; id <= 10; ++id) {
         try {
-            servo_map[id] = new Servo(id, "/dev/ttyUSB0", 0.1f, 0.01f, 0.05f);
-            servo_map[id]->setSpeedMax(1000);
-            servo_map[id]->setAcceleration(50);
-            // Initialize target_positions with current pos to avoid jump
+            // 创建Servo对象，连接串口 /dev/ttyUSB0
+            servo_map[id] = new Servo(id, "/dev/ttyUSB0", 0.8f, 0.0f, 0.01f);
+            servo_map[id]->setSpeedMax(1000);   // 最大速度
+            servo_map[id]->setAcceleration(50); // 加速度
+
+            // 读取当前舵机位置，作为初始目标，防止启动时突然跳动
             auto fb = servo_map[id]->get_feedback(id);
             target_positions[id] = fb.pos;
+
             ROS_INFO("Initialized servo ID=%d on /dev/ttyUSB0", id);
         } catch (const std::exception& e) {
             ROS_ERROR("Failed to initialize servo ID=%d: %s", id, e.what());
         }
     }
 
+    // ------------------- ROS 话题 -------------------
+    // 订阅控制指令话题（外部控制节点发布到这里）
     ros::Subscriber sub = nh.subscribe("/command_joint_states", 10, commandCallback);
+
+    // 发布舵机反馈话题
     ros::Publisher fb_pub = nh.advertise<sensor_msgs::JointState>("/feedback_feetech_joint_states", 10);
 
-    ros::Rate rate(50); // 50Hz
+    ros::Rate rate(50); // 循环频率 50Hz
 
-    while (ros::ok()) {
-        ros::spinOnce();
+// ------------------- 主循环 -------------------
+while (ros::ok()) {
+    ros::spinOnce();
 
-        // Send commands to all servos based on stored targets
-for (auto& [id, servo] : servo_map) {
-    if (!servo) {
-        ROS_WARN("servo pointer for ID=%d is nullptr, skipping command", id);
-        continue;
+    // 每秒打印一次 target_positions（编码器值和弧度）
+    static double last_print_time = 0.0;
+    double now_time = ros::Time::now().toSec();
+    if (now_time - last_print_time >= 1.0) {
+        std::ostringstream oss_enc, oss_rad;
+        oss_enc << "[Target Enc] ";
+        oss_rad << "[Target Rad] ";
+        for (int id = 1; id <= 10; ++id) {
+            int enc_val = target_positions[id];
+            double rad_val = enc2rad(enc_val);
+            oss_enc << enc_val << "\t";
+            oss_rad << std::fixed << std::setprecision(3) << rad_val << "\t";
+        }
+        ROS_INFO_STREAM(oss_enc.str());
+        ROS_INFO_STREAM(oss_rad.str());
+        last_print_time = now_time;
     }
-    auto it = target_positions.find(id);
-    if (it == target_positions.end()) {
-        ROS_WARN("No target position found for servo ID=%d, skipping command", id);
-        continue;
+
+    // ----------- 发送控制命令 -----------
+    for (auto& [id, servo] : servo_map) {
+        if (!servo) {
+            ROS_WARN("servo pointer for ID=%d is nullptr, skipping command", id);
+            continue;
+        }
+        auto it = target_positions.find(id);
+        if (it == target_positions.end()) {
+            ROS_WARN("No target position found for servo ID=%d, skipping command", id);
+            continue;
+        }
+        int target_enc = it->second;
+
+        try {
+            servo->PID_setAngle_control(target_enc);
+        } catch (const std::exception& e) {
+            ROS_ERROR("Exception when sending command to servo ID=%d: %s", id, e.what());
+        } catch (...) {
+            ROS_ERROR("Unknown exception when sending command to servo ID=%d", id);
+        }
     }
-    int target_enc = it->second;
-
-    try {
-        servo->PID_setAngle_control(target_enc);
-    } catch (const std::exception& e) {
-        ROS_ERROR("Exception when sending command to servo ID=%d: %s", id, e.what());
-    } catch (...) {
-        ROS_ERROR("Unknown exception when sending command to servo ID=%d", id);
-    }
-}
 
 
-        // Publish feedback
+        // ----------- 采集反馈并发布 -----------
         sensor_msgs::JointState fb_msg;
         fb_msg.header.stamp = ros::Time::now();
         fb_msg.name.resize(10);
         fb_msg.position.resize(10);
         fb_msg.velocity.resize(10);
         fb_msg.effort.resize(10);
-        
 
-for (int i = 0; i < 10; ++i) {
-    int servo_id = i + 1;
-    fb_msg.name[i] = "servo_" + std::to_string(servo_id);
+        for (int i = 0; i < 10; ++i) {
+            int servo_id = i + 1;
+            fb_msg.name[i] = "servo_" + std::to_string(servo_id);
 
-    auto it = servo_map.find(servo_id);
-    if (it == servo_map.end() || !(it->second)) {
-        fb_msg.position[i] = 0.0;
-        fb_msg.velocity[i] = 0.0;
-        fb_msg.effort[i] = 0.0;
-        ROS_WARN_THROTTLE(10, "Servo ID=%d not initialized or null pointer, sending zero feedback", servo_id);
-        continue;
-    }
+            auto it = servo_map.find(servo_id);
+            if (it == servo_map.end() || !(it->second)) {
+                fb_msg.position[i] = 0.0;
+                fb_msg.velocity[i] = 0.0;
+                fb_msg.effort[i] = 0.0;
+                ROS_WARN_THROTTLE(10, "Servo ID=%d not initialized or null pointer, sending zero feedback", servo_id);
+                continue;
+            }
 
-    try {
-        auto fb = it->second->get_feedback(servo_id);
-        fb_msg.position[i] = enc2rad(fb.pos);
-        fb_msg.velocity[i] = enc2rad(fb.speed);
-        fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
-    } catch (const std::exception& e) {
-        ROS_ERROR("Exception when getting feedback from servo ID=%d: %s", servo_id, e.what());
-        fb_msg.position[i] = 0.0;
-        fb_msg.velocity[i] = 0.0;
-        fb_msg.effort[i] = 0.0;
-    } catch (...) {
-        ROS_ERROR("Unknown exception when getting feedback from servo ID=%d", servo_id);
-        fb_msg.position[i] = 0.0;
-        fb_msg.velocity[i] = 0.0;
-        fb_msg.effort[i] = 0.0;
-    }
-}
+            try {
+                auto fb = it->second->get_feedback(servo_id);
+                fb_msg.position[i] = enc2rad(fb.pos);
+                fb_msg.velocity[i] = enc2rad(fb.speed);
+                fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
+            } catch (const std::exception& e) {
+                ROS_ERROR("Exception when getting feedback from servo ID=%d: %s", servo_id, e.what());
+                fb_msg.position[i] = 0.0;
+                fb_msg.velocity[i] = 0.0;
+                fb_msg.effort[i] = 0.0;
+            } catch (...) {
+                ROS_ERROR("Unknown exception when getting feedback from servo ID=%d", servo_id);
+                fb_msg.position[i] = 0.0;
+                fb_msg.velocity[i] = 0.0;
+                fb_msg.effort[i] = 0.0;
+            }
+        }
 
-
+        // 发布反馈
         fb_pub.publish(fb_msg);
 
         rate.sleep();
     }
 
+    // ------------------- 程序退出清理 -------------------
     ROS_INFO("Exiting and cleaning up");
     for (auto& pair : servo_map) {
         delete pair.second;
