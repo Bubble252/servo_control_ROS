@@ -1,227 +1,250 @@
-#include "servo_controller/ServoFeedback.h"
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
-#include "servo_controller/servo.h"
+#include "SCServo.h" // 底层库（请确保库路径与 include 配置正确）
 #include <map>
+#include <vector>
+#include <string>
+#include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <unistd.h> // usleep
+#include <cmath>
 
-#include <string>
+using std::map;
+using std::vector;
+using std::string;
 
-// 每个舵机的最大扭矩（单位：Nm），用于反馈计算
+// -------------------- 配置常量 --------------------
+const vector<uint8_t> servo_IDs = {1,2,3,4,5,6,7,8,9,10};
+const int SERVO_ENCODER_RES = 4096; // 编码器分辨率 (0..4095)
 double servo_max_torque[10] = {10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3};
 
-// 保存舵机对象的map： key=舵机ID, value=Servo类指针
-std::map<int, Servo*> servo_map;
+SMS_STS sm_st; // 全局串口 / SCServo 对象
 
-// 保存目标位置的map： key=舵机ID, value=目标编码器值
-std::map<int, int> target_positions;  
+map<int,int> target_positions; // 目标位置 map<id, encoder>
 
-// 弧度转编码器值
+// 速度/加速度 与 调速参数
+const int SPEED_MAX = 2000;    // 最大速度（编码器单位）
+const int ACCELERATION = 50;   // 加速度（示例）
+const int ERROR_THRESHOLD = 10;// 误差阈值：小于此认为到位（编码器单位）
+const int MIN_SPEED = 400;      // 最小速度（避免太小无力）
+
+
+// -------------------- 内部反馈结构（带 success 标志） --------------------
+// 为了在内存里保存是否读取成功，加 success 字段，而不依赖 ROS msg 的结构
+struct InternalFeedback {
+    int pos = 0;    // 位置 （编码器）
+    int speed = 0;  // 速度（编码器单位，具体含义依驱动）
+    int load = 0;   // 负载/电流等（若可读）
+    bool success = false; // 本次读是否成功
+};
+
+// -------------------- 辅助函数 --------------------
+
+// 把弧度转为编码器值（与你原来的实现保持一致）
 inline int rad2enc(double rad) {
-    return static_cast<int>(rad / 3.14 * 2048.0 + 2048.0);
+    return static_cast<int>(rad / 3.141592653589793 * 2048.0 + 2048.0);
 }
 
-// 编码器值转弧度
+// 把编码器值转为弧度（用于发布）
 inline double enc2rad(int enc) {
-    return (enc - 2048) * 3.14 / 2048.0;
+    return (enc - 2048) * 3.141592653589793 / 2048.0;
 }
 
-// 将JointState消息中的关节索引转成舵机ID
-// 例如 JointState[11] -> 舵机ID 1
-int jointIndexToServoId(int idx) {
-    return idx - 10; 
+// 计算 "带符号的最短误差"：返回范围 (-RES/2, RES/2]
+// 说明：如果 target==current，则差为0；如果 target 在 current 的前方或后方会返回最短路径的带符号差
+inline int shortest_signed_error(int target, int current) {
+    // 先把差映射到 [0, RES)
+    int diff = ( (target - current) % SERVO_ENCODER_RES + SERVO_ENCODER_RES ) % SERVO_ENCODER_RES;
+    // 把大于半圈的部分转为负向差
+    if (diff > SERVO_ENCODER_RES/2) diff -= SERVO_ENCODER_RES;
+    return diff;
 }
 
-// ------------------- 接收控制指令的回调 -------------------
-// 当有新的 /command_joint_states 消息时，这个函数会被调用
+// -------------------- ROS 回调：更新目标位置 --------------------
 void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
-    ROS_INFO("Received control command, position size=%lu", msg->position.size());
-
-    // 如果指令长度不够，就直接忽略
-    if (msg->position.size() < 21) {
-        ROS_WARN("JointState.position length less than 21");
-        return;
-    }
-
-    // 遍历关节索引 11~20（即舵机 1~10）
+    // 你的 JointState 里关节索引是 11..20 对应舵机 1..10
+    if (msg->position.size() < 21) return;
     for (int idx = 11; idx <= 20; ++idx) {
-        int servo_id = jointIndexToServoId(idx);
-        double target_rad = msg->position[idx];    // 目标弧度
-        int target_enc = rad2enc(target_rad);      // 转成编码器值
-
-        // 更新目标位置（不会立即发给舵机）
+        int servo_id = idx - 10;
+        double target_rad = msg->position[idx];
+        int target_enc = rad2enc(target_rad);
         target_positions[servo_id] = target_enc;
-
-        ROS_DEBUG("Updated target for servo ID=%d: angle(rad)=%.3f, encoder=%d", 
-                  servo_id, target_rad, target_enc);
     }
 }
 
+// 初始化阶段调用（只调用一次）
+void syncReadInit() {
+    const uint8_t RXPACKET_LEN = 4; // 2字节位置 + 2字节速度
+    sm_st.syncReadBegin(static_cast<int>(servo_IDs.size()), RXPACKET_LEN);
+}
+
+// 结束时调用（只调用一次）
+void syncReadClose() {
+    sm_st.syncReadEnd();
+}
+
+// 每次批量读调用（循环内多次调用）
+map<int, InternalFeedback> batch_read_feedback() {
+    map<int, InternalFeedback> feedbacks;
+    const uint8_t RXPACKET_LEN = 4;
+    uint8_t rxPacket[RXPACKET_LEN];
+
+    // 发送同步读指令
+    sm_st.syncReadPacketTx(const_cast<uint8_t*>(servo_IDs.data()), servo_IDs.size(),
+                           SMS_STS_PRESENT_POSITION_L, RXPACKET_LEN);
+
+    for (size_t i = 0; i < servo_IDs.size(); ++i) {
+        uint8_t id = servo_IDs[i];
+        InternalFeedback fb;
+        if (!sm_st.syncReadPacketRx(id, rxPacket)) {
+            ROS_WARN_THROTTLE(5, "Sync read failed for ID %d", id);
+        } else {
+            fb.pos = sm_st.syncReadRxPacketToWrod(15);
+            fb.speed = sm_st.syncReadRxPacketToWrod(15);
+            fb.load = 0;
+            fb.success = true;
+        }
+        feedbacks[id] = fb;
+    }
+
+    return feedbacks;
+}
+
+
+// -------------------- 批量写位置（基于批量读的结果决定速度） --------------------
+void batch_set_positions(const map<int, InternalFeedback>& feedbacks) {
+    for (auto id : servo_IDs) {
+        auto it_target = target_positions.find(id);
+        if (it_target == target_positions.end()) continue; // 没有目标就跳过
+        int target_pos = it_target->second;
+
+        // 取得本次读到的当前位置（带 success 标志）
+        auto it_fb = feedbacks.find(id);
+        if (it_fb == feedbacks.end() || !it_fb->second.success) {
+            // 没读到当前位置就跳过发送控制（更稳妥）
+            continue;
+        }
+        int current_pos = it_fb->second.pos;
+
+        // 计算带符号的最短误差（考虑环绕）
+        int signed_err = shortest_signed_error(target_pos, current_pos);
+        int err_mag = std::abs(signed_err); // 幅值用于速度映射  所以取了绝对值
+
+        // 如果误差小于阈值，停下来（或把速度设为0）
+        int speed = 0;
+        if (err_mag >= ERROR_THRESHOLD) {
+            // 简单线性映射：误差越大速度越大，映射到 [MIN_SPEED, SPEED_MAX]
+            // 这里用 err_mag / SERVO_ENCODER_RES 的比例来缩放到 SPEED_MAX
+            int mapped = (err_mag * SPEED_MAX) / SERVO_ENCODER_RES;
+            mapped = std::max(MIN_SPEED, mapped);
+            speed = std::min(SPEED_MAX, mapped);
+        } else {
+            speed = 0;
+        }
+
+        // 写位置命令：WritePosEx(id, position, speed, acceleration)
+        // 注意：WritePosEx 是以绝对位置为目标，speed 是运行速度 (无符号)
+        sm_st.WritePosEx(id, target_pos, speed, ACCELERATION);
+    }
+}
+
+// -------------------- 主函数 --------------------
 int main(int argc, char** argv) {
     ros::init(argc, argv, "servo_controller_node");
-    ros::NodeHandle nh;
+    ros::NodeHandle nh("~");  // "~" 私有命名空间，读取节点参数
 
-    ROS_INFO("servo_controller_node started");
+    std::string port;
+    // 从参数服务器读取串口设备路径，默认/dev/ttyUSB0
+    nh.param<std::string>("port", port, "/dev/ttyUSB0");
 
-    // ------------------- 舵机初始化 -------------------
-    for (int id = 1; id <= 10; ++id) {
-        try {
-            // 创建Servo对象，连接串口 /dev/ttyUSB0
-            servo_map[id] = new Servo(id, "/dev/ttyUSB0", 0.7f, 0.0f, 0.0f);
-            servo_map[id]->setSpeedMax(1000);   // 最大速度
-            servo_map[id]->setAcceleration(50); // 加速度
+    ROS_INFO("打开串口 %s，波特率 1000000", port.c_str());
 
-            // 读取当前舵机位置，作为初始目标，防止启动时突然跳动
-            auto fb = servo_map[id]->get_feedback(id);
-            target_positions[id] = fb.pos;
-
-            ROS_INFO("Initialized servo ID=%d on /dev/ttyUSB0", id);
-        } catch (const std::exception& e) {
-            ROS_ERROR("Failed to initialize servo ID=%d: %s", id, e.what());
-        }
+    if (!sm_st.begin(1000000, port.c_str())) {
+        ROS_ERROR("串口初始化失败");
+        return 1;
     }
 
-    // ------------------- ROS 话题 -------------------
-    // 订阅控制指令话题（外部控制节点发布到这里）
-    ros::Subscriber sub = nh.subscribe("/command_joint_states", 10, commandCallback);
+    // 启动时用当前实际位置初始化 target_positions（避免跳动）
+    for (auto id : servo_IDs) {
+        int pos = sm_st.ReadPos(id);
+        target_positions[id] = pos;
+    }
 
-    // 发布舵机反馈话题
+    ros::Subscriber sub = nh.subscribe("/command_joint_states", 10, commandCallback);
     ros::Publisher fb_pub = nh.advertise<sensor_msgs::JointState>("/feedback_feetech_joint_states", 10);
 
-    ros::Rate rate(100); // 循环频率 100Hz
-    
-    // 在main函数的主循环前定义计时变量
-	ros::Time last_cycle_time = ros::Time::now();
-	static int cycle_count = 0;  // 用于累计周期数
-	static double total_cycle_time = 0.0;  // 累计总周期时间
+    ros::Rate rate(100);
+    ros::Time last_print_time = ros::Time::now();
 
-// ------------------- 主循环 -------------------
-while (ros::ok()) {
-    ros::spinOnce();
-    
-    
-    
-    
-    
-        // --------------- 新增：计算循环频率 ---------------
-    ros::Time current_time = ros::Time::now();
-    ros::Duration cycle_duration = current_time - last_cycle_time;
-    last_cycle_time = current_time;
+	syncReadInit();
+	
+	
+    while (ros::ok()) {
+        ros::spinOnce();
 
-    // 累计周期时间，每3个周期计算一次平均频率（减少打印开销）
-    total_cycle_time += cycle_duration.toSec();
-    cycle_count++;
-    if (cycle_count >= 3) {
-        double avg_period = total_cycle_time / cycle_count;
-        double avg_freq = 1.0 / avg_period;
-        ROS_INFO("Average control frequency: %.2f Hz (period: %.3f ms)", 
-                 avg_freq, avg_period * 1000);
-        cycle_count = 0;
-        total_cycle_time = 0.0;
-    }
-    // --------------------------------------------------
-    
-    
-    
-    
-    
-    
-    
+        // 1) 批量读
+        auto feedbacks = batch_read_feedback();
 
-    // 每秒打印一次 target_positions（编码器值和弧度）
-    static double last_print_time = 0.0;
-    double now_time = ros::Time::now().toSec();
-    if (now_time - last_print_time >= 1.0) {
-        std::ostringstream oss_enc, oss_rad;
-        oss_enc << "[Target Enc] ";
-        oss_rad << "[Target Rad] ";
-        for (int id = 1; id <= 10; ++id) {
-            int enc_val = target_positions[id];
-            double rad_val = enc2rad(enc_val);
-            oss_enc << enc_val << "\t";
-            oss_rad << std::fixed << std::setprecision(3) << rad_val << "\t";
-        }
-        ROS_INFO_STREAM(oss_enc.str());
-        ROS_INFO_STREAM(oss_rad.str());
-        last_print_time = now_time;
-    }
+        // 2) 基于反馈进行批量写（速度动态调整）
+        batch_set_positions(feedbacks);
 
-    // ----------- 发送控制命令 -----------
-    for (auto& [id, servo] : servo_map) {
-        if (!servo) {
-            ROS_WARN("servo pointer for ID=%d is nullptr, skipping command", id);
-            continue;
-        }
-        auto it = target_positions.find(id);
-        if (it == target_positions.end()) {
-            ROS_WARN("No target position found for servo ID=%d, skipping command", id);
-            continue;
-        }
-        int target_enc = it->second;
-
-        try {
-            servo->PID_setAngle_control(target_enc);
-        } catch (const std::exception& e) {
-            ROS_ERROR("Exception when sending command to servo ID=%d: %s", id, e.what());
-        } catch (...) {
-            ROS_ERROR("Unknown exception when sending command to servo ID=%d", id);
-        }
-    }
-
-
-        // ----------- 采集反馈并发布 -----------
+        // 3) 发布反馈话题（JointState）
         sensor_msgs::JointState fb_msg;
         fb_msg.header.stamp = ros::Time::now();
-        fb_msg.name.resize(10);
-        fb_msg.position.resize(10);
-        fb_msg.velocity.resize(10);
-        fb_msg.effort.resize(10);
+        fb_msg.name.resize(servo_IDs.size());
+        fb_msg.position.resize(servo_IDs.size());
+        fb_msg.velocity.resize(servo_IDs.size());
+        fb_msg.effort.resize(servo_IDs.size());
 
-        for (int i = 0; i < 10; ++i) {
-            int servo_id = i + 1;
-            fb_msg.name[i] = "servo_" + std::to_string(servo_id);
+        for (size_t i = 0; i < servo_IDs.size(); ++i) {
+            int id = servo_IDs[i];
+            fb_msg.name[i] = "servo_" + std::to_string(id);
 
-            auto it = servo_map.find(servo_id);
-            if (it == servo_map.end() || !(it->second)) {
+            auto it_fb = feedbacks.find(id);
+            if (it_fb == feedbacks.end() || !it_fb->second.success) {
                 fb_msg.position[i] = 0.0;
                 fb_msg.velocity[i] = 0.0;
                 fb_msg.effort[i] = 0.0;
-                ROS_WARN_THROTTLE(10, "Servo ID=%d not initialized or null pointer, sending zero feedback", servo_id);
                 continue;
             }
-
-            try {
-                auto fb = it->second->get_feedback(servo_id);
-                fb_msg.position[i] = enc2rad(fb.pos);
-                fb_msg.velocity[i] = enc2rad(fb.speed);
-                fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
-            } catch (const std::exception& e) {
-                ROS_ERROR("Exception when getting feedback from servo ID=%d: %s", servo_id, e.what());
-                fb_msg.position[i] = 0.0;
-                fb_msg.velocity[i] = 0.0;
-                fb_msg.effort[i] = 0.0;
-            } catch (...) {
-                ROS_ERROR("Unknown exception when getting feedback from servo ID=%d", servo_id);
-                fb_msg.position[i] = 0.0;
-                fb_msg.velocity[i] = 0.0;
-                fb_msg.effort[i] = 0.0;
-            }
+            const InternalFeedback& fb = it_fb->second;
+            fb_msg.position[i] = enc2rad(fb.pos);
+            // 注意：这里直接用 enc->rad 把 speed 转为弧度/单位时间 只是近似（取决于 speed 的单位）
+            fb_msg.velocity[i] = fb.speed/2048*3.1415926;
+            fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
         }
-
-        // 发布反馈
         fb_pub.publish(fb_msg);
+
+        // 4) 每秒打印一次详细状态（ID, target, current, signed error）
+        if ((ros::Time::now() - last_print_time).toSec() > 1.0) {
+            std::ostringstream oss;
+            oss << "\nServo status (enc):\n";
+            oss << "ID\tTarget\tCurrent\tSignedErr\n";
+            oss << std::setfill(' ');
+            for (auto id : servo_IDs) {
+                int target = target_positions.count(id) ? target_positions.at(id) : 0;
+                int current = 0;
+                int signed_err = 0;
+                auto it_fb = feedbacks.find(id);
+                if (it_fb != feedbacks.end() && it_fb->second.success) {
+                    current = it_fb->second.pos;
+                    signed_err = shortest_signed_error(target, current); // 带符号的最短差
+                }
+                oss << std::setw(2) << id << "\t"
+                    << std::setw(5) << target << "\t"
+                    << std::setw(5) << current << "\t"
+                    << std::setw(6) << signed_err << "\n";
+            }
+            ROS_INFO_STREAM(oss.str());
+            last_print_time = ros::Time::now();
+        }
 
         rate.sleep();
     }
+    syncReadClose();
 
-    // ------------------- 程序退出清理 -------------------
-    ROS_INFO("Exiting and cleaning up");
-    for (auto& pair : servo_map) {
-        delete pair.second;
-    }
-    servo_map.clear();
-
+    sm_st.end();
     return 0;
 }
 

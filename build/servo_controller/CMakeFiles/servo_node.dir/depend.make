@@ -61,8 +61,6 @@ servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/std_msgs/Header.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcDecl.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /opt/ros/noetic/include/xmlrpcpp/XmlRpcValue.h
-servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/devel/include/servo_controller/ServoFeedback.h
-servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_controller/include/servo_controller/servo.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /root/FT_Servo_linux/examples/SMS_STS/servo_ws/src/servo_controller/src/servo_node.cpp
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /root/FT_Servo_linux/src/INST.h
 servo_controller/CMakeFiles/servo_node.dir/src/servo_node.cpp.o: /root/FT_Servo_linux/src/SCS.h

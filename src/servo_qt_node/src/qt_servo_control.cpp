@@ -190,7 +190,7 @@ void QtServoControl::rosSpin() {
 }
 
 void QtServoControl::feedbackCallback(const sensor_msgs::JointState::ConstPtr& msg) {
-    ROS_INFO("Received feedback message with %lu positions", msg->position.size());
+    //ROS_INFO("Received feedback message with %lu positions", msg->position.size());
     for (size_t i = 0; i < 2; ++i) {
         int id = static_cast<int>(i) + 1;
         if (feedbackData_.find(id) == feedbackData_.end()) {
