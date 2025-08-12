@@ -13,20 +13,17 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
 {
     ROS_INFO("QtServoControl constructor called");
 
-    // 发布舵机目标角度
+    // 发布和订阅
     pub_joint_state_ = nh_.advertise<sensor_msgs::JointState>("/command_joint_states", 10);
-
-    // 订阅反馈
     fb_sub_ = nh_.subscribe("/feedback_feetech_joint_states", 100, &QtServoControl::feedbackCallback, this);
 
-    // UI初始化
+    // UI初始化：标签和滑块
     label1_ = new QLabel("Servo 1 Angle (rad): 0.00");
     label2_ = new QLabel("Servo 2 Angle (rad): 0.00");
 
     slider1_ = new QSlider(Qt::Horizontal);
-    slider1_->setRange(-314, 314);  // -π 到 π, *100缩放
+    slider1_->setRange(-314, 314);
     slider1_->setValue(-268);
-
     slider2_ = new QSlider(Qt::Horizontal);
     slider2_->setRange(-314, 314);
     slider2_->setValue(-16);
@@ -34,9 +31,79 @@ QtServoControl::QtServoControl(ros::NodeHandle& nh, QWidget* parent)
     connect(slider1_, &QSlider::valueChanged, this, &QtServoControl::onSlider1Changed);
     connect(slider2_, &QSlider::valueChanged, this, &QtServoControl::onSlider2Changed);
 
-    // 图表初始化部分省略，为节省篇幅...
+    // **图表系列初始化**
+    series_pos_1_ = new QtCharts::QLineSeries(this);
+    series_pos_2_ = new QtCharts::QLineSeries(this);
+    series_speed_1_ = new QtCharts::QLineSeries(this);
+    series_speed_2_ = new QtCharts::QLineSeries(this);
+    series_effort_1_ = new QtCharts::QLineSeries(this);
+    series_effort_2_ = new QtCharts::QLineSeries(this);
 
-    // 定时器更新 ros spin 和图表
+    // **创建图表及坐标轴**
+    // 位置图表
+    QtCharts::QChart* chart_pos = new QtCharts::QChart();
+    chart_pos->addSeries(series_pos_1_);
+    chart_pos->addSeries(series_pos_2_);
+    axisX_pos_ = new QtCharts::QValueAxis();
+    axisY_pos_ = new QtCharts::QValueAxis();
+    chart_pos->addAxis(axisX_pos_, Qt::AlignBottom);
+    chart_pos->addAxis(axisY_pos_, Qt::AlignLeft);
+    series_pos_1_->attachAxis(axisX_pos_);
+    series_pos_1_->attachAxis(axisY_pos_);
+    series_pos_2_->attachAxis(axisX_pos_);
+    series_pos_2_->attachAxis(axisY_pos_);
+    chart_pos->setTitle("Position Feedback");
+
+    // 速度图表
+    QtCharts::QChart* chart_speed = new QtCharts::QChart();
+    chart_speed->addSeries(series_speed_1_);
+    chart_speed->addSeries(series_speed_2_);
+    axisX_speed_ = new QtCharts::QValueAxis();
+    axisY_speed_ = new QtCharts::QValueAxis();
+    chart_speed->addAxis(axisX_speed_, Qt::AlignBottom);
+    chart_speed->addAxis(axisY_speed_, Qt::AlignLeft);
+    series_speed_1_->attachAxis(axisX_speed_);
+    series_speed_1_->attachAxis(axisY_speed_);
+    series_speed_2_->attachAxis(axisX_speed_);
+    series_speed_2_->attachAxis(axisY_speed_);
+    chart_speed->setTitle("Speed Feedback");
+
+    // 力矩图表
+    QtCharts::QChart* chart_effort = new QtCharts::QChart();
+    chart_effort->addSeries(series_effort_1_);
+    chart_effort->addSeries(series_effort_2_);
+    axisX_effort_ = new QtCharts::QValueAxis();
+    axisY_effort_ = new QtCharts::QValueAxis();
+    chart_effort->addAxis(axisX_effort_, Qt::AlignBottom);
+    chart_effort->addAxis(axisY_effort_, Qt::AlignLeft);
+    series_effort_1_->attachAxis(axisX_effort_);
+    series_effort_1_->attachAxis(axisY_effort_);
+    series_effort_2_->attachAxis(axisX_effort_);
+    series_effort_2_->attachAxis(axisY_effort_);
+    chart_effort->setTitle("Effort Feedback");
+
+    // **创建 ChartView 并开启抗锯齿**
+    chartView_pos_ = new QtCharts::QChartView(chart_pos);
+    chartView_pos_->setRenderHint(QPainter::Antialiasing);
+
+    chartView_speed_ = new QtCharts::QChartView(chart_speed);
+    chartView_speed_->setRenderHint(QPainter::Antialiasing);
+
+    chartView_effort_ = new QtCharts::QChartView(chart_effort);
+    chartView_effort_->setRenderHint(QPainter::Antialiasing);
+
+    // **布局所有控件**
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(label1_);
+    layout->addWidget(slider1_);
+    layout->addWidget(label2_);
+    layout->addWidget(slider2_);
+    layout->addWidget(chartView_pos_);
+    layout->addWidget(chartView_speed_);
+    layout->addWidget(chartView_effort_);
+    setLayout(layout);
+
+    // 定时器用于 rosSpin() 和图表更新
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &QtServoControl::rosSpin);
     connect(timer, &QTimer::timeout, this, &QtServoControl::updateCharts);
