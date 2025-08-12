@@ -97,26 +97,35 @@ void Servo::closeSerial() {// 关闭串口
     }
 }
 
-Servo::ServoFeedback Servo::get_feedback(int id) {// 获取舵机反馈信息
+Servo::ServoFeedback Servo::get_feedback(int id) {
+    static std::map<int, ServoFeedback> last_good_fb; // 保存每个舵机的最后一次正常反馈
+
     ServoFeedback fb;
-    if (sm_st.FeedBack(id) != -1) {// 检查舵机反馈是否成功
+    if (sm_st.FeedBack(id) != -1) { // 读成功
         fb.pos = sm_st.ReadPos(id);
         fb.speed = sm_st.ReadSpeed(id);
         fb.current = sm_st.ReadCurrent(id);
         fb.load = sm_st.ReadLoad(id);
         fb.move = sm_st.ReadMove(id);
         fb.voltage = sm_st.ReadVoltage(id);
-        std::cout << id << "," << fb.pos << "," << fb.speed << ","
-                  << fb.load << "," << fb.voltage << ","
-                  << fb.temper << "," << fb.move << ","
-                  << fb.current << std::endl;
+        fb.temper = sm_st.ReadTemper(id);
         fb.success = true;
-    } else {
-        std::cerr << "FeedBack error for ID " << id << std::endl;
-        fb.success = false;
+
+        last_good_fb[id] = fb; // 更新最后的正常值
+    } else { // 读失败
+        std::cerr << "FeedBack error for ID " << id << ", using last known good value" << std::endl;
+        if (last_good_fb.find(id) != last_good_fb.end()) {
+            fb = last_good_fb[id]; // 用上一次的正常值
+            fb.success = false;    // 标记失败，但值是旧的
+        } else {
+            // 没有历史值时，才用全 0
+            fb.pos = fb.speed = fb.current = fb.load = fb.voltage = fb.temper = fb.move = 0;
+            fb.success = false;
+        }
     }
     return fb;
 }
+
 
 float Servo::pid_calculate(PID& pid, float target, float current, float out_max) {// PID 计算函数
     float error = target - current;// 计算误差
@@ -142,10 +151,10 @@ float Servo::pid_calculate(PID& pid, float target, float current, float out_max)
     std::cout << "PID Calculation:\n";
     std::cout << "Target    : " << target << "\n"; 
     std::cout << "Error     : " << error << "\n";
-    std::cout << "P (Kp*e)  : " << pid.Kp * error << "\n";
-    std::cout << "I (Ki*∑e) : " << pid.Ki * pid.integral << "\n";
-    std::cout << "D (Kd*Δe) : " << pid.Kd * derivative << "\n";
-    std::cout << "Output    : " << pid.output << "\n";
+    //std::cout << "P (Kp*e)  : " << pid.Kp * error << "\n";
+    //std::cout << "I (Ki*∑e) : " << pid.Ki * pid.integral << "\n";
+    //std::cout << "D (Kd*Δe) : " << pid.Kd * derivative << "\n";
+    //std::cout << "Output    : " << pid.output << "\n";
 
     return pid.output;
 }

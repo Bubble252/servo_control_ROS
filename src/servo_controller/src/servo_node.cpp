@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     for (int id = 1; id <= 10; ++id) {
         try {
             // 创建Servo对象，连接串口 /dev/ttyUSB0
-            servo_map[id] = new Servo(id, "/dev/ttyUSB0", 0.8f, 0.0f, 0.01f);
+            servo_map[id] = new Servo(id, "/dev/ttyUSB0", 0.7f, 0.0f, 0.0f);
             servo_map[id]->setSpeedMax(1000);   // 最大速度
             servo_map[id]->setAcceleration(50); // 加速度
 
