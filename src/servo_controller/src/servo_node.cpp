@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
             const InternalFeedback& fb = it_fb->second;
             fb_msg.position[i] = enc2rad(fb.pos);
             // 注意：这里直接用 enc->rad 把 speed 转为弧度/单位时间 只是近似（取决于 speed 的单位）
-            fb_msg.velocity[i] = fb.speed/2048*3.1415926;
+            fb_msg.velocity[i] =  static_cast<double>(fb.speed) / 2048.0 * M_PI;
             fb_msg.effort[i] = (static_cast<double>(fb.load) / 1000.0) * servo_max_torque[i];
         }
         fb_pub.publish(fb_msg);
