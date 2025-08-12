@@ -113,7 +113,7 @@ Servo::ServoFeedback Servo::get_feedback(int id) {
 
         last_good_fb[id] = fb; // 更新最后的正常值
     } else { // 读失败
-        std::cerr << "FeedBack error for ID " << id << ", using last known good value" << std::endl;
+        //std::cerr << "FeedBack error for ID " << id << ", using last known good value" << std::endl;
         if (last_good_fb.find(id) != last_good_fb.end()) {
             fb = last_good_fb[id]; // 用上一次的正常值
             fb.success = false;    // 标记失败，但值是旧的
@@ -148,8 +148,8 @@ float Servo::pid_calculate(PID& pid, float target, float current, float out_max)
     }
 
     std::cout << "----------------------\n";// 调试输出 PID 计算过程
-    std::cout << "PID Calculation:\n";
-    std::cout << "Target    : " << target << "\n"; 
+    //std::cout << "PID Calculation:\n";
+    //std::cout << "Target    : " << target << "\n"; 
     std::cout << "Error     : " << error << "\n";
     //std::cout << "P (Kp*e)  : " << pid.Kp * error << "\n";
     //std::cout << "I (Ki*∑e) : " << pid.Ki * pid.integral << "\n";

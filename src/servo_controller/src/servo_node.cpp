@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     // 发布舵机反馈话题
     ros::Publisher fb_pub = nh.advertise<sensor_msgs::JointState>("/feedback_feetech_joint_states", 10);
 
-    ros::Rate rate(50); // 循环频率 50Hz
+    ros::Rate rate(200); // 循环频率 200Hz
 
 // ------------------- 主循环 -------------------
 while (ros::ok()) {
