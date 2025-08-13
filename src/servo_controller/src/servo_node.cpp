@@ -37,7 +37,27 @@ struct InternalFeedback {
     int speed = 0;  // 速度（编码器单位，具体含义依驱动）
     int load = 0;   // 负载/电流等（若可读）
     bool success = false; // 本次读是否成功
+    
+    ros::Time last_load_update; // 上次更新 load 的时间
 };
+
+
+// -------------------- 低频读取 load --------------------
+void updateLoadLowFreq(map<int, InternalFeedback>& feedbacks, double interval_sec = 0.5) {
+    ros::Time now = ros::Time::now();
+    for (auto& kv : feedbacks) {
+        int id = kv.first;
+        InternalFeedback& fb = kv.second;
+        if ((now - fb.last_load_update).toSec() >= interval_sec) {
+            int load_val = sm_st.ReadLoad(id);
+            if (load_val != -1) {
+                fb.load = load_val;
+                fb.last_load_update = now;
+            }
+        }
+    }
+}
+
 
 // -------------------- 辅助函数 --------------------
 
@@ -185,9 +205,14 @@ int main(int argc, char** argv) {
 
         // 1) 批量读
         auto feedbacks = batch_read_feedback();
-
-        // 2) 基于反馈进行批量写（速度动态调整）
+        
+                // 2) 基于反馈进行批量写（速度动态调整）
         batch_set_positions(feedbacks);
+        
+    // 2) 低频更新 load
+    updateLoadLowFreq(feedbacks, 1.3); // 每 0.5 秒更新一次
+
+
 
         // 3) 发布反馈话题（JointState）
         sensor_msgs::JointState fb_msg;
@@ -226,15 +251,19 @@ int main(int argc, char** argv) {
                 int target = target_positions.count(id) ? target_positions.at(id) : 0;
                 int current = 0;
                 int signed_err = 0;
+                int load_val = 0;
                 auto it_fb = feedbacks.find(id);
                 if (it_fb != feedbacks.end() && it_fb->second.success) {
                     current = it_fb->second.pos;
                     signed_err = shortest_signed_error(target, current); // 带符号的最短差
+                    load_val = it_fb->second.load;
                 }
                 oss << std::setw(2) << id << "\t"
                     << std::setw(5) << target << "\t"
                     << std::setw(5) << current << "\t"
-                    << std::setw(6) << signed_err << "\n";
+                    << std::setw(6) << signed_err << "\t"
+                    << std::setw(5) << load_val << "\n";
+                    
             }
             ROS_INFO_STREAM(oss.str());
             last_print_time = ros::Time::now();
