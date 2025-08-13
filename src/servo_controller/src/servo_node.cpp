@@ -132,42 +132,51 @@ map<int, InternalFeedback> batch_read_feedback() {
 }
 
 
-// -------------------- 写位置（基于批量读的结果决定速度） --------------------
+// -------------------- 写位置（改为批量写） --------------------
 void batch_set_positions(const map<int, InternalFeedback>& feedbacks) {
-    for (auto id : servo_IDs) {
+    const size_t n = servo_IDs.size();
+    uint8_t IDs[n];
+    int16_t Positions[n];
+    uint16_t Speeds[n];
+    uint8_t Accs[n];
+
+    for (size_t i = 0; i < n; ++i) {
+        uint8_t id = servo_IDs[i];
+        IDs[i] = id;
+
         auto it_target = target_positions.find(id);
-        if (it_target == target_positions.end()) continue; // 没有目标就跳过
-        int target_pos = it_target->second;
-
-        // 取得本次读到的当前位置（带 success 标志）
-        auto it_fb = feedbacks.find(id);
-        if (it_fb == feedbacks.end() || !it_fb->second.success) {
-            // 没读到当前位置就跳过发送控制（更稳妥）
-            continue;
-        }
-        int current_pos = it_fb->second.pos;
-
-        // 计算带符号的最短误差（考虑环绕）
-        int signed_err = shortest_signed_error(target_pos, current_pos);
-        int err_mag = std::abs(signed_err); // 幅值用于速度映射  所以取了绝对值
-
-        // 如果误差小于阈值，停下来（或把速度设为0）
-        int speed = 0;
-        if (err_mag >= ERROR_THRESHOLD) {
-            // 简单线性映射：误差越大速度越大，映射到 [MIN_SPEED, SPEED_MAX]
-            // 这里用 err_mag / SERVO_ENCODER_RES 的比例来缩放到 SPEED_MAX
-            int mapped = (err_mag * SPEED_MAX) / SERVO_ENCODER_RES;
-            mapped = std::max(MIN_SPEED, mapped);
-            speed = std::min(SPEED_MAX, mapped);
+        if (it_target == target_positions.end()) {
+            // 没有目标位置，直接用当前位置作为目标（保持不动）
+            Positions[i] = feedbacks.count(id) && feedbacks.at(id).success ? feedbacks.at(id).pos : 2048; 
         } else {
-            speed = 0;
+            Positions[i] = it_target->second;
         }
 
-        // 写位置命令：WritePosEx(id, position, speed, acceleration)
-        // 注意：WritePosEx 是以绝对位置为目标，speed 是运行速度 (无符号)
-        sm_st.WritePosEx(id, target_pos, speed, ACCELERATION);
+        // 获取当前位置和反馈，计算速度
+        int speed = 0;
+        if (feedbacks.count(id) && feedbacks.at(id).success) {
+            int current_pos = feedbacks.at(id).pos;
+            int signed_err = shortest_signed_error(Positions[i], current_pos);
+            int err_mag = std::abs(signed_err);
+
+            if (err_mag >= ERROR_THRESHOLD) {
+                int mapped = (err_mag * SPEED_MAX) / SERVO_ENCODER_RES;
+                mapped = std::max(MIN_SPEED, mapped);
+                speed = std::min(SPEED_MAX, mapped);
+            } else {
+                speed = 0;
+            }
+        } else {
+            speed = 0; // 没有反馈时设0速度
+        }
+
+        Speeds[i] = static_cast<uint16_t>(speed);
+        Accs[i] = ACCELERATION;
     }
+
+    sm_st.SyncWritePosEx(IDs, n, Positions, Speeds, Accs);
 }
+
 
 // -------------------- 主函数 --------------------
 int main(int argc, char** argv) {
