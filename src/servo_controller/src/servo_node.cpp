@@ -95,7 +95,7 @@ void commandCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
 // 初始化阶段调用（只调用一次）
 void syncReadInit() {
-    const uint8_t RXPACKET_LEN = 4; // 2字节位置 + 2字节速度
+    const uint8_t RXPACKET_LEN = 6; // 2字节位置 + 2字节速度+2字节力矩
     sm_st.syncReadBegin(static_cast<int>(servo_IDs.size()), RXPACKET_LEN);
 }
 
@@ -107,7 +107,7 @@ void syncReadClose() {
 // 每次批量读调用（循环内多次调用）
 map<int, InternalFeedback> batch_read_feedback() {
     map<int, InternalFeedback> feedbacks;
-    const uint8_t RXPACKET_LEN = 4;
+    const uint8_t RXPACKET_LEN = 6;
     uint8_t rxPacket[RXPACKET_LEN];
 
     // 发送同步读指令
@@ -122,7 +122,7 @@ map<int, InternalFeedback> batch_read_feedback() {
         } else {
             fb.pos = sm_st.syncReadRxPacketToWrod(15);
             fb.speed = sm_st.syncReadRxPacketToWrod(15);
-            fb.load = 0;
+            fb.load = sm_st.syncReadRxPacketToWrod(15);
             fb.success = true;
         }
         feedbacks[id] = fb;
@@ -132,7 +132,7 @@ map<int, InternalFeedback> batch_read_feedback() {
 }
 
 
-// -------------------- 批量写位置（基于批量读的结果决定速度） --------------------
+// -------------------- 写位置（基于批量读的结果决定速度） --------------------
 void batch_set_positions(const map<int, InternalFeedback>& feedbacks) {
     for (auto id : servo_IDs) {
         auto it_target = target_positions.find(id);
@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
         batch_set_positions(feedbacks);
         
     // 2) 低频更新 load
-    updateLoadLowFreq(feedbacks, 1.3); // 每 0.5 秒更新一次
+    //updateLoadLowFreq(feedbacks, 1.3); // 每 0.5 秒更新一次
 
 
 
